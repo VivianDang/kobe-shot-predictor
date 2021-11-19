@@ -108,11 +108,11 @@ sns.pairplot(kobe_clean, palette = 'mako');
 
 #%%
 # PAIRPLOT - SHOT COLUMNS - **TAKES A MINUTE TO RUN**
-kobe_shots = kobe[kobe['']]
+kobe_shots = kobe[kobe['Jump Shot', 'Dunk', 'Layup', 'Tip Shot', 'Hook Shot', 'Bank Shot']]
 plt.figure(figsize=(12,12))
 sns.pairplot(kobe_clean, palette = 'mako');
 
-'Jump Shot', 'Dunk', 'Layup', 'Tip Shot', 'Hook Shot', 'Bank Shot'
+
 
 #%%
 print("\nREADY TO CONTINUE.")
