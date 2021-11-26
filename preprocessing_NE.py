@@ -58,17 +58,80 @@ kobe.info()
 #kobe['game_date'].sort_values(ascending = True).unique()[0:200]
 
 #%%
-# VARIABLE ASSIGNMENT
-    # clutchtime = 
-    # overtime = 
-
-#%%
 # DROP NA VALUES
 kobe = kobe.dropna() # na in shot_made_flag
 
 # DROP IRRELEVANT / REDUNDANT COLUMNS
 kobe_clean = kobe.drop(['team_id', 'team_name', 'game_id', 'game_event_id', 'game_date', 'matchup', 'season'], axis = 1)
 kobe_clean.info()
+
+#%%
+kobe_clean.columns
+
+#%%
+# VARIABLE ASSIGNMENT
+clutchtime = kobe_clean[(kobe_clean['period'] >= 4) & (kobe_clean['minutes_remaining'] <= 1)]
+overtime = kobe_clean[(kobe_clean['period'] >= 5)]
+
+
+
+#%%
+# FEATURE ENGINEERING
+kobe_szn_splits1 = kobe_clean.groupby(["game_year", "opponent"])[["shot_made_flag", "shot_distance"]].mean()
+
+kobe_szn_splits2 = kobe_clean.groupby("opponent")[["shot_made_flag", "shot_distance"]].mean()
+
+kobe_szn_splits3 = kobe_clean.groupby(["opponent"])[["shot_made_flag", "shot_distance"]].mean()
+
+print(kobe_szn_splits1)
+#kobe_szn_splits2
+#kobe_szn_splits3
+
+#%%
+# SCRATCH - ADDING OPPONENT AVERAGES BY YEAR TO OG DATAFRAME
+
+#for rows in kobe_clean:
+#    if kobe_clean['game_year'] == kobe_szn_splits1['game_year']:
+#        kobe_clean['opp_avg'] = kobe_szn_splits1['shot_made_flag']
+
+# if kobe_clean['opponent'] == kobe_szn_splits1['opponent'] & :
+#kobe_clean.head()
+
+#%%
+kobe_szn_splits1.index
+
+#%%
+# FG% BY OPPONENT / SEASON
+plt.figure(figsize=(24,12))
+sns.barplot(data=kobe_clean, x='opponent', y='shot_made_flag', hue='game_year')
+plt.title("FG% BY SEASON / SHOT DISTANCE / OPPONENT", fontsize = 20)
+plt.xlabel("OPPONENT", fontsize = 16)
+#plt.xticks(range(1996,2017,1))
+plt.ylabel("FG%", fontsize = 16);
+
+
+#%%
+# FIELD GOAL % - BY SEASON / OPPONENT
+plt.figure(figsize=(12,12))
+sns.scatterplot(data=kobe_szn_splits1, x='game_year', y='shot_made_flag', hue='opponent', palette='mako')
+plt.title("FG% BY SEASON / OPPONENT", fontsize = 20)
+plt.xlabel("SEASON (YR)", fontsize = 16)
+plt.xticks(range(1996,2017,1))
+plt.ylabel("FIELD GOAL %", fontsize = 16);
+#plt.yticks()
+
+#%%
+# SHOT DISTANCE - BY SEASON / OPPONENT
+plt.figure(figsize=(12,12))
+sns.barplot(data=kobe_szn_splits1, x=kobe_szn_splits1.index, y=kobe_szn_splits1.index, hue='shot_made_flag', size='shot_made_flag', palette='mako')
+plt.title("SHOT DISTANCE BY SEASON / OPPONENT", fontsize = 20)
+plt.xlabel("OPPONENT", fontsize = 16)
+#plt.xticks(range(1996,2017,1))
+plt.ylabel("SHOT DISTANCE (FT.)", fontsize = 16);
+#plt.yticks()
+
+#%%
+# SHOTS BY MONTH
 
 #%%
 # CLEANING / RE-FORMATTING
@@ -93,6 +156,8 @@ kobe_clean.info()
 
 #%%
 # TEAM / OPPONENT ANALYSIS
+# BIRTHDAY
+# CHILD BDAY
 
 #%%
 
@@ -111,6 +176,11 @@ sns.pairplot(kobe_clean, palette = 'mako');
 kobe_shots = kobe[kobe['Jump Shot', 'Dunk', 'Layup', 'Tip Shot', 'Hook Shot', 'Bank Shot']]
 plt.figure(figsize=(12,12))
 sns.pairplot(kobe_clean, palette = 'mako');
+
+
+#%%
+# CHART
+
 
 
 
