@@ -25,7 +25,7 @@ print("\nIMPORT SUCCESS.")
 
 #%%
 # DATA IMPORTS
-kobe = '/Users/nehat312/kobe-shot-predictor/data.csv'
+kobe = 'data.csv'
 kobe = pd.read_csv(kobe, header = 0, index_col = 'shot_id')
 kobe.info()
 #kobe.head()
