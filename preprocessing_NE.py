@@ -2,21 +2,25 @@
 
 ### KAGGLE PROMPT: 
 
-# Using 20 years of data on Kobe's swishes and misses, can you predict which shots will find the bottom of the net?
-# This competition is well suited for practicing classification basics, feature engineering, and time series analysis.
+# * Using 20 years of data on Kobe's swishes and misses, can you predict which shots will find the bottom of the net?
+# * This competition is well suited for practicing classification basics, feature engineering, and time series analysis.
 
-# Practice got Kobe an eight-figure contract and 5 championship rings. What will it get you?
+# * Practice got Kobe an eight-figure contract and 5 championship rings. What will it get you?
+
+#%% [markdown]
+
+### SMART QUESTIONS: 
+# * (1) Does the spatial location of shots affect accuracy?
+# * (2) Does the game situation affect accuracy?
+# * (3) Do his shots indicate the hot hand effect?
 
 #%%
 # LIBRARY IMPORTS
 import os
-
 import pandas as pd
 import numpy as np
-
 import seaborn as sns
 import matplotlib.pyplot as plt
-
 from scipy import stats as stats
 import statistics
 import datetime as dt
@@ -54,10 +58,6 @@ kobe.info()
 # * opponent = ['POR', 'UTA', 'VAN', 'LAC', 'HOU', 'SAS', 'DEN', 'SAC', 'CHI', 'GSW', 'MIN', 'IND', 'SEA', 'DAL', 'PHI', 'DET', 'MIL', 'TOR', 'MIA', 'PHX', 'CLE', 'NJN', 'NYK', 'CHA', 'WAS', 'ORL', 'ATL', 'MEM', 'BOS', 'NOH', 'NOP', 'OKC', 'BKN']
 
 #%%
-# EXPLORATION
-#kobe['game_date'].sort_values(ascending = True).unique()[0:200]
-
-#%%
 # DROP NA VALUES
 kobe = kobe.dropna() # na in shot_made_flag
 
@@ -65,22 +65,71 @@ kobe = kobe.dropna() # na in shot_made_flag
 kobe_clean = kobe.drop(['team_id', 'team_name', 'game_id', 'game_event_id', 'game_date', 'matchup', 'season'], axis = 1)
 kobe_clean.info()
 
+# EJECT OUTLIERS
+kobe_clean = kobe_clean[(kobe_clean['shot_distance'] <= 50)]
+kobe_clean['shot_distance'].unique()
+
+
 #%%
 kobe_clean.columns
 
 #%%
+numerical_features = ['loc_x', 'loc_y', 'minutes_remaining', 'period', 'shot_distance']
+categorical_features = ['combined_shot_type', 'playoffs','shot_zone_area', 'shot_zone_basic', 'shot_zone_range', 'opponent']
+
+kobe_categorical_one_hot = pd.get_dummies(kobe_clean[categorical_features])
+kobe_cleaned = pd.concat([kobe_clean[numerical_features], kobe_categorical_one_hot], axis=1)
+kobe_cleaned.head()
+
+#%% [markdown]
+### GAME SITUATION
+#%%
 # VARIABLE ASSIGNMENT
-clutchtime = kobe_clean[(kobe_clean['period'] >= 4) & (kobe_clean['minutes_remaining'] <= 1)]
+
+qtr1 = kobe_clean[(kobe_clean['period'] == 1)]
+qtr2 = kobe_clean[(kobe_clean['period'] == 2)]
+qtr3 = kobe_clean[(kobe_clean['period'] == 3)]
+qtr4 = kobe_clean[(kobe_clean['period'] == 4)]
 overtime = kobe_clean[(kobe_clean['period'] >= 5)]
 
+basetime = kobe_clean[(kobe_clean['period'] <= 4)]
+clutchtime_1min = kobe_clean[(kobe_clean['period'] >= 4) & (kobe_clean['minutes_remaining'] <= 1)]
+clutchtime_2min = kobe_clean[(kobe_clean['period'] >= 4) & (kobe_clean['minutes_remaining'] <= 2)]
+clutchtime_5min = kobe_clean[(kobe_clean['period'] >= 4) & (kobe_clean['minutes_remaining'] <= 5)]
 
+#playoff_clutchtime = 
+#%%
+kobe_clean['minutes_remaining'].unique()
+
+#%%
+# SHOOTING SPLITS - BY PERIOD [1-7]
+plt.figure(figsize=(12,12))
+sns.boxplot(data=kobe_clean, x='period', y='shot_distance', hue='shot_made_flag', palette = 'mako')
+plt.title("KOBE - SHOOTING BY PERIOD", fontsize = 20)
+plt.xlabel("PERIOD", fontsize = 16)
+#plt.xticks(range(1996,2017,1))
+plt.ylabel("SHOT DISTANCE", fontsize = 16)
+plt.yticks(range(0,55,5));
+
+#%% [markdown]
+### OBSERVATIONS:
+    # * Shots Missed - mean shot distance increases as time goes on
+    # * Far greater level of success shooting from inside ~20ft
+
+#%%
+# SHOOTING SPLITS - BY MINUTES REMAINING [0-11]
+plt.figure(figsize=(24,12))
+sns.boxplot(data=kobe_clean, x='minutes_remaining', y='shot_distance', hue='shot_made_flag', palette = 'mako')
+plt.title("KOBE - SHOOTING BY MINUTE", fontsize = 20)
+plt.xlabel("MINUTES REMAINING", fontsize = 16)
+#plt.xticks(range(1996,2017,1))
+plt.ylabel("SHOT DISTANCE", fontsize = 16)
+plt.yticks(range(0,55,5));
 
 #%%
 # FEATURE ENGINEERING
 kobe_szn_splits1 = kobe_clean.groupby(["game_year", "opponent"])[["shot_made_flag", "shot_distance"]].mean()
-
 kobe_szn_splits2 = kobe_clean.groupby("opponent")[["shot_made_flag", "shot_distance"]].mean()
-
 kobe_szn_splits3 = kobe_clean.groupby(["opponent"])[["shot_made_flag", "shot_distance"]].mean()
 
 print(kobe_szn_splits1)
@@ -179,10 +228,10 @@ sns.pairplot(kobe_clean, palette = 'mako');
 
 
 #%%
-# CHART
-
-
+# TRAIN-TEST/SPLIT
+X = pd.concat([kobe_clean[numerical_features], kobe_categorical_one_hot], axis=1)
+Y = kobe_clean['shot_made_flag']
 
 
 #%%
-print("\nREADY TO CONTINUE.")
+print("\nANALYSIS CONCLUSION")
