@@ -312,3 +312,45 @@ plt.ylabel("Succeed")
 plt.xlabel("Distance(ft)")
 plt.show()
 # %%
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import statsmodels.api as sm
+from statsmodels.formula.api import glm
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report
+from sklearn import metrics
+from matplotlib.lines import Line2D
+#%%
+kobe_spa_cp = kobe_spatial[["combined_shot_type", "shot_zone_area", "shot_distance", "shot_made_flag"]].copy()
+area_dummy = pd.get_dummies(kobe_spa_cp.shot_zone_area, prefix="area")
+type_dummy = pd.get_dummies(kobe_spa_cp.combined_shot_type, prefix="type")
+kobe_spa_cp = kobe_spa_cp.join([area_dummy, type_dummy])
+kobe_spa_cp.drop(["shot_zone_area", "combined_shot_type"], axis=1, inplace=True)
+#%%
+###### model ######
+model = glm("shot_made_flag~C(shot_zone_area)+shot_distance+C(combined_shot_type)", data=kobe_clean, family=sm.families.Binomial())
+modelfit = model.fit()
+print(modelfit.summary())
+#%%
+y = kobe_spa_cp["shot_made_flag"]
+x = kobe_spa_cp.drop(["shot_made_flag"], axis=1)
+x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=123)
+#%%
+model1 = LogisticRegression()
+model1.fit(x_train, y_train)
+print('Logit model accuracy (with the test set):', model1.score(x_test, y_test))
+#%%
+# predict
+y_pred = pd.Series(model.predict(X_test))
+y_test = y_test.reset_index(drop=True)
+z = pd.concat([y_test, y_pred], axis=1)
+z.columns = ['True', 'Prediction']
+z.head()
+#%%
+print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
+print("Precision:", metrics.precision_score(y_test, y_pred))
+print("Recall:", metrics.recall_score(y_test, y_pred))
+# %%
