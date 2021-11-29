@@ -1,6 +1,7 @@
 #%%
 # LIBRARY IMPORTS
 import os
+from matplotlib import colors
 
 import pandas as pd
 import numpy as np
@@ -165,7 +166,29 @@ combined_accuracy.columns = ["success rate", "count"]
 # combined_accuracy = combined_accuracy.reset_index()
 combined_accuracy
 #%%
+def shot_side(x):
+    """Return which side of the basket did kobe shot.
+        @param x (pd.Series): row in df
+        @return string: {"right side","left side","middle"}
+    """
+    if x < 0:
+        return "right side"
+    elif x > 0:
+        return "left side"
+    else: return "middle"
+#%%
 #### jump shot #####
+jump_accuracy = kobe_jump.groupby("shot_zone_range")["shot_made_flag"].agg(["mean", "count"]).sort_values("mean", ascending=False)
+jump_accuracy.columns = ["success rate", "count"]
+# combined_accuracy = combined_accuracy.reset_index()
+jump_accuracy
+#%%
+kobe_jump["side"] = kobe_jump["loc_x"].apply(lambda x: shot_side(x))
+jump_accuracy2 = kobe_jump.groupby("side")["shot_made_flag"].agg(["mean","count"]).sort_values("mean", ascending=False)
+jump_accuracy2.columns = ["success rate", "count"]
+jump_accuracy2
+#%%
+# plot
 plt.subplots(figsize=(13,11))
 draw_court(outer_lines=True)
 ax1 = sns.scatterplot(x="loc_x", y="loc_y", hue="shot_made_flag", palette={0:"red",1:"green"}, data=kobe_jump, alpha=0.6)
@@ -177,6 +200,12 @@ plt.xlim(300,-300)
 plt.show()
 # %%
 #### bank shot #####
+kobe_bank["side"] = kobe_bank["loc_x"].apply(lambda x: shot_side(x))
+bank_accuracy = kobe_bank.groupby("side")["shot_made_flag"].agg(["mean","count"]).sort_values("mean", ascending=False)
+bank_accuracy.columns = ["success rate", "count"]
+bank_accuracy
+#%%
+# plot
 plt.subplots(figsize=(8,6))
 draw_court(outer_lines=True)
 ax2 = sns.scatterplot(x="loc_x", y="loc_y", hue="shot_made_flag", palette={0:"red",1:"green"}, data=kobe_bank, alpha=0.7)
@@ -188,6 +217,12 @@ plt.xlim(300,-300)
 plt.show()
 # %%
 #### hook shot #####
+kobe_hook["side"] = kobe_hook["loc_x"].apply(lambda x: shot_side(x))
+hook_accuracy = kobe_hook.groupby("side")["shot_made_flag"].agg(["mean","count"]).sort_values("mean", ascending=False)
+hook_accuracy.columns = ["success rate", "count"]
+hook_accuracy
+#%%
+# plot
 plt.subplots(figsize=(8,6))
 draw_court(outer_lines=True)
 ax3 = sns.scatterplot(x="loc_x", y="loc_y", hue="shot_made_flag", palette={0:"red",1:"green"}, data=kobe_hook, alpha=0.7)
@@ -199,6 +234,12 @@ plt.xlim(300,-300)
 plt.show()
 # %%
 #### layup #####
+kobe_layup["side"] = kobe_layup["loc_x"].apply(lambda x: shot_side(x))
+layup_accuracy = kobe_layup.groupby("side")["shot_made_flag"].agg(["mean","count"]).sort_values("mean", ascending=False)
+layup_accuracy.columns = ["success rate", "count"]
+layup_accuracy
+#%%
+# plot
 plt.subplots(figsize=(8,6))
 draw_court(outer_lines=True)
 ax4 = sns.scatterplot(x="loc_x", y="loc_y", hue="shot_made_flag", palette={0:"red",1:"green"}, data=kobe_layup, alpha=0.5)
@@ -209,18 +250,30 @@ plt.ylim(-100,500)
 plt.xlim(300,-300)
 plt.show()
 # %%
-#### tip ##### 
+#### tip #####   
+kobe_tip["side"] = kobe_tip["loc_x"].apply(lambda x: shot_side(x))
+tip_accuracy = kobe_tip.groupby("side")["shot_made_flag"].agg(["mean","count"]).sort_values("mean", ascending=False)
+tip_accuracy.columns = ["success rate", "count"]
+tip_accuracy
+#%%
+# plot
 plt.subplots(figsize=(8,6))
 draw_court(outer_lines=True)
 sns.scatterplot(x="loc_x", y="loc_y", hue="shot_made_flag", palette={0:"red",1:"green"}, data=kobe_tip, alpha=0.7)
 
 # plt.legend(bbox_to_anchor=(1, 1))
-plt.title("Tip Shot")
+plt.title("Tip In")
 plt.ylim(-100,500)
 plt.xlim(300,-300)
 plt.show()
 # %%
 #### dunk shot #####
+kobe_dunk["side"] = kobe_dunk["loc_x"].apply(lambda x: shot_side(x))
+dunk_accuracy = kobe_dunk.groupby("side")["shot_made_flag"].agg(["mean","count"]).sort_values("mean", ascending=False)
+dunk_accuracy.columns = ["success rate", "count"]
+dunk_accuracy
+#%%
+# plot
 plt.subplots(figsize=(8,6))
 draw_court(outer_lines=True)
 ax5 = sns.scatterplot(x="loc_x", y="loc_y", hue="shot_made_flag", palette={0:"red",1:"green"}, data=kobe_dunk, alpha=0.7)
@@ -251,7 +304,7 @@ sns.scatterplot(x="loc_x", y="loc_y", hue="shot_zone_area",style="shot_made_flag
 
 plt.legend(bbox_to_anchor=(1, 1))
 plt.title("Shot Zone Area")
-plt.ylim(-100,500)
+plt.ylim(-100,600)
 plt.xlim(300,-300)
 plt.show()
 # %%
@@ -287,21 +340,59 @@ sns.scatterplot(x="loc_x", y="loc_y", hue="shot_zone_range",style="shot_made_fla
 
 plt.legend(bbox_to_anchor=(1, 1))
 plt.title("Shot Zone Range")
-plt.ylim(-100,500)
+plt.ylim(-100,900)
 plt.xlim(300,-300)
 plt.show()
 # %%
 ####### Accuracy vs Distance #######
-distance_accuracy = kobe_spatial.groupby("action_type")["shot_made_flag"].agg(["mean", "count"]).sort_values("count", ascending=False)
-action_accuracy = action_accuracy.reset_index()
-action_accuracy
-#%%
 plt.subplots(figsize=(8,8))
-sns.lmplot(x="shot_distance", y="shot_made_flag",data=kobe_spatial,y_jitter=0.02, logistic=True)
+sns.lmplot(x="shot_distance", y="shot_made_flag",data=kobe_spatial[kobe_spatial.shot_distance < 50],y_jitter=0.02, logistic=True, palette="Blue_r")
 
-plt.legend(bbox_to_anchor=(1, 1))
 plt.title("Accuracy vs Distance")
+plt.xlim(0,55)
 plt.ylabel("Succeed")
-plt.xlabel("Distance")
+plt.xlabel("Distance(ft)")
 plt.show()
+# %%
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import statsmodels.api as sm
+from statsmodels.formula.api import glm
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report
+from sklearn import metrics
+from matplotlib.lines import Line2D
+#%%
+kobe_spa_cp = kobe_spatial[["combined_shot_type", "shot_zone_area", "shot_distance", "shot_made_flag"]].copy()
+area_dummy = pd.get_dummies(kobe_spa_cp.shot_zone_area, prefix="area")
+type_dummy = pd.get_dummies(kobe_spa_cp.combined_shot_type, prefix="type")
+kobe_spa_cp = kobe_spa_cp.join([area_dummy, type_dummy])
+kobe_spa_cp.drop(["shot_zone_area", "combined_shot_type"], axis=1, inplace=True)
+#%%
+###### model ######
+model = glm("shot_made_flag~C(shot_zone_area)+shot_distance+C(combined_shot_type)", data=kobe_clean, family=sm.families.Binomial())
+modelfit = model.fit()
+print(modelfit.summary())
+#%%
+y = kobe_spa_cp["shot_made_flag"]
+x = kobe_spa_cp.drop(["shot_made_flag"], axis=1)
+x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=123)
+#%%
+model1 = LogisticRegression()
+model1.fit(x_train, y_train)
+print('Logit model accuracy (with the test set):', model1.score(x_test, y_test))
+#%%
+# predict
+y_pred = pd.Series(model.predict(X_test))
+y_test = y_test.reset_index(drop=True)
+z = pd.concat([y_test, y_pred], axis=1)
+z.columns = ['True', 'Prediction']
+z.head()
+#%%
+print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
+print("Precision:", metrics.precision_score(y_test, y_pred))
+print("Recall:", metrics.recall_score(y_test, y_pred))
 # %%
