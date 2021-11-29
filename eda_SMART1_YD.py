@@ -166,12 +166,29 @@ combined_accuracy.columns = ["success rate", "count"]
 # combined_accuracy = combined_accuracy.reset_index()
 combined_accuracy
 #%%
+def shot_side(x):
+    """Return which side of the basket did kobe shot.
+        @param x (pd.Series): row in df
+        @return string: {"right side","left side","middle"}
+    """
+    if x < 0:
+        return "right side"
+    elif x > 0:
+        return "left side"
+    else: return "middle"
+#%%
 #### jump shot #####
 jump_accuracy = kobe_jump.groupby("shot_zone_range")["shot_made_flag"].agg(["mean", "count"]).sort_values("mean", ascending=False)
 jump_accuracy.columns = ["success rate", "count"]
 # combined_accuracy = combined_accuracy.reset_index()
 jump_accuracy
 #%%
+kobe_jump["side"] = kobe_jump["loc_x"].apply(lambda x: shot_side(x))
+jump_accuracy2 = kobe_jump.groupby("side")["shot_made_flag"].agg(["mean","count"]).sort_values("mean", ascending=False)
+jump_accuracy2.columns = ["success rate", "count"]
+jump_accuracy2
+#%%
+# plot
 plt.subplots(figsize=(13,11))
 draw_court(outer_lines=True)
 ax1 = sns.scatterplot(x="loc_x", y="loc_y", hue="shot_made_flag", palette={0:"red",1:"green"}, data=kobe_jump, alpha=0.6)
@@ -183,6 +200,12 @@ plt.xlim(300,-300)
 plt.show()
 # %%
 #### bank shot #####
+kobe_bank["side"] = kobe_bank["loc_x"].apply(lambda x: shot_side(x))
+bank_accuracy = kobe_bank.groupby("side")["shot_made_flag"].agg(["mean","count"]).sort_values("mean", ascending=False)
+bank_accuracy.columns = ["success rate", "count"]
+bank_accuracy
+#%%
+# plot
 plt.subplots(figsize=(8,6))
 draw_court(outer_lines=True)
 ax2 = sns.scatterplot(x="loc_x", y="loc_y", hue="shot_made_flag", palette={0:"red",1:"green"}, data=kobe_bank, alpha=0.7)
@@ -194,6 +217,12 @@ plt.xlim(300,-300)
 plt.show()
 # %%
 #### hook shot #####
+kobe_hook["side"] = kobe_hook["loc_x"].apply(lambda x: shot_side(x))
+hook_accuracy = kobe_hook.groupby("side")["shot_made_flag"].agg(["mean","count"]).sort_values("mean", ascending=False)
+hook_accuracy.columns = ["success rate", "count"]
+hook_accuracy
+#%%
+# plot
 plt.subplots(figsize=(8,6))
 draw_court(outer_lines=True)
 ax3 = sns.scatterplot(x="loc_x", y="loc_y", hue="shot_made_flag", palette={0:"red",1:"green"}, data=kobe_hook, alpha=0.7)
@@ -205,11 +234,12 @@ plt.xlim(300,-300)
 plt.show()
 # %%
 #### layup #####
-layup_accuracy = kobe_layup.groupby("shot_made_flag").agg(["count"])
-# layup_accuracy.columns = ["success rate", "count"]
-# combined_accuracy = combined_accuracy.reset_index()
+kobe_layup["side"] = kobe_layup["loc_x"].apply(lambda x: shot_side(x))
+layup_accuracy = kobe_layup.groupby("side")["shot_made_flag"].agg(["mean","count"]).sort_values("mean", ascending=False)
+layup_accuracy.columns = ["success rate", "count"]
 layup_accuracy
 #%%
+# plot
 plt.subplots(figsize=(8,6))
 draw_court(outer_lines=True)
 ax4 = sns.scatterplot(x="loc_x", y="loc_y", hue="shot_made_flag", palette={0:"red",1:"green"}, data=kobe_layup, alpha=0.5)
@@ -220,18 +250,30 @@ plt.ylim(-100,500)
 plt.xlim(300,-300)
 plt.show()
 # %%
-#### tip ##### 
+#### tip #####   
+kobe_tip["side"] = kobe_tip["loc_x"].apply(lambda x: shot_side(x))
+tip_accuracy = kobe_tip.groupby("side")["shot_made_flag"].agg(["mean","count"]).sort_values("mean", ascending=False)
+tip_accuracy.columns = ["success rate", "count"]
+tip_accuracy
+#%%
+# plot
 plt.subplots(figsize=(8,6))
 draw_court(outer_lines=True)
 sns.scatterplot(x="loc_x", y="loc_y", hue="shot_made_flag", palette={0:"red",1:"green"}, data=kobe_tip, alpha=0.7)
 
 # plt.legend(bbox_to_anchor=(1, 1))
-plt.title("Tip Shot")
+plt.title("Tip In")
 plt.ylim(-100,500)
 plt.xlim(300,-300)
 plt.show()
 # %%
 #### dunk shot #####
+kobe_dunk["side"] = kobe_dunk["loc_x"].apply(lambda x: shot_side(x))
+dunk_accuracy = kobe_dunk.groupby("side")["shot_made_flag"].agg(["mean","count"]).sort_values("mean", ascending=False)
+dunk_accuracy.columns = ["success rate", "count"]
+dunk_accuracy
+#%%
+# plot
 plt.subplots(figsize=(8,6))
 draw_court(outer_lines=True)
 ax5 = sns.scatterplot(x="loc_x", y="loc_y", hue="shot_made_flag", palette={0:"red",1:"green"}, data=kobe_dunk, alpha=0.7)
