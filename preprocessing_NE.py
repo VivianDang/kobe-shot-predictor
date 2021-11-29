@@ -25,13 +25,15 @@ from scipy import stats as stats
 import statistics
 import datetime as dt
 
-print("\nIMPORT SUCCESS.")
+print("\nIMPORT SUCCESS")
 
 #%%
 # DATA IMPORTS
 kobe = 'data.csv'
+opp_stats = '/Users/nehat312/kobe-shot-predictor/images/image_scratch.xlsx'
 kobe = pd.read_csv(kobe, header = 0, index_col = 'shot_id')
-kobe.info()
+opp_stats = pd.read_excel(opp_stats, sheet_name = 'OPP STATS', header = 0, index_col = 'OPP')
+opp_stats.info()
 #kobe.head()
 #kobe.columns
 
@@ -70,7 +72,7 @@ kobe_clean = kobe_clean[(kobe_clean['shot_distance'] <= 50)]
 #kobe_clean['shot_distance'].unique()
 
 #%%
-kobe_clean.columns
+kobe_clean['opponent'].unique()
 
 #%%
 numerical_features = ['loc_x', 'loc_y', 'minutes_remaining', 'period', 'shot_distance']
@@ -89,6 +91,9 @@ qtr1 = kobe_clean[(kobe_clean['period'] == 1)]
 qtr2 = kobe_clean[(kobe_clean['period'] == 2)]
 qtr3 = kobe_clean[(kobe_clean['period'] == 3)]
 qtr4 = kobe_clean[(kobe_clean['period'] == 4)]
+ot1 = kobe_clean[(kobe_clean['period'] == 5)]
+ot2 = kobe_clean[(kobe_clean['period'] == 6)]
+ot3 = kobe_clean[(kobe_clean['period'] == 7)]
 half1 = kobe_clean[(kobe_clean['period'] >= 1) & (kobe_clean['period'] <= 2)]
 half2 = kobe_clean[(kobe_clean['period'] >= 3) & (kobe_clean['period'] <= 4)]
 overtime = kobe_clean[(kobe_clean['period'] >= 5)]
@@ -98,7 +103,10 @@ clutchtime_1min = kobe_clean[(kobe_clean['period'] >= 4) & (kobe_clean['minutes_
 clutchtime_2min = kobe_clean[(kobe_clean['period'] >= 4) & (kobe_clean['minutes_remaining'] <= 2)]
 clutchtime_5min = kobe_clean[(kobe_clean['period'] >= 4) & (kobe_clean['minutes_remaining'] <= 5)]
 
-#playoffs= 
+playoffs = kobe_clean[(kobe_clean['playoffs'] == 1)]
+regular = kobe_clean[(kobe_clean['playoffs'] == 0)]
+
+print("\nVARIABLES ASSIGNED SUCCESSFULLY")
 
 #%%
 # SHOOTING SPLITS - BY PERIOD [1-7]
@@ -111,10 +119,20 @@ plt.ylabel("SHOT DISTANCE", fontsize = 16)
 plt.yticks(range(0,55,5));
 
 #%%
+# SHOOTING SPLITS - BY PERIOD [1-7]
+qtr1_pct = pd.DataFrame(qtr1.groupby("shot_distance")["shot_made_flag"].mean())
+qtr2_pct = pd.DataFrame(qtr2.groupby("shot_distance")["shot_made_flag"].mean())
+qtr3_pct = pd.DataFrame(qtr3.groupby("shot_distance")["shot_made_flag"].mean())
+qtr4_pct = pd.DataFrame(qtr4.groupby("shot_distance")["shot_made_flag"].mean())
+overtime_pct = pd.DataFrame(overtime.groupby("shot_distance")["shot_made_flag"].mean())
+qtrs_pct = pd.concat([qtr1_pct, qtr2_pct, qtr3_pct, qtr4_pct, overtime_pct], axis=1)
+qtrs_pct
+
+#%%
 # SHOOTING SPLITS - BY MINUTES REMAINING [0-11]
 plt.figure(figsize=(24,12))
 sns.boxplot(data=kobe_clean, x='minutes_remaining', y='shot_distance', hue='shot_made_flag', palette = 'mako')
-plt.title("FIELD GOAL ATTEMPTS BY MINUTE / SHOT DISTANCE", fontsize = 20)
+plt.title("FG% BY MINUTE / SHOT DISTANCE", fontsize = 20)
 plt.xlabel("MINUTES REMAINING", fontsize = 16)
 #plt.xticks(range(1996,2017,1))
 plt.ylabel("SHOT DISTANCE", fontsize = 16)
@@ -125,7 +143,7 @@ plt.yticks(range(0,55,5));
 plt.figure(figsize=(24,30))
 ax1 = plt.subplot(411)
 sns.boxplot(data=qtr1, x='minutes_remaining', y='shot_distance', hue='shot_made_flag', palette = 'mako')
-plt.title("1ST QUARTER FGA BY MINUTE / SHOT DISTANCE", fontsize = 20)
+plt.title("1ST QUARTER FG% BY MINUTE / SHOT DISTANCE", fontsize = 20)
 plt.xlabel("MINUTES REMAINING", fontsize = 16)
 #plt.xticks(range(1996,2017,1))
 plt.ylabel("SHOT DISTANCE", fontsize = 16)
@@ -133,7 +151,7 @@ plt.yticks(range(0,55,5))
 
 ax2 = plt.subplot(412)
 sns.boxplot(data=qtr2, x='minutes_remaining', y='shot_distance', hue='shot_made_flag', palette = 'mako')
-plt.title("2ND QUARTER FGA BY MINUTE / SHOT DISTANCE", fontsize = 20)
+plt.title("2ND QUARTER FG% BY MINUTE / SHOT DISTANCE", fontsize = 20)
 plt.xlabel("MINUTES REMAINING", fontsize = 16)
 #plt.xticks(range(1996,2017,1))
 plt.ylabel("SHOT DISTANCE", fontsize = 16)
@@ -141,7 +159,7 @@ plt.yticks(range(0,55,5))
 
 ax3 = plt.subplot(413)
 sns.boxplot(data=qtr3, x='minutes_remaining', y='shot_distance', hue='shot_made_flag', palette = 'mako')
-plt.title("3RD QUARTER FGA BY MINUTE / SHOT DISTANCE", fontsize = 20)
+plt.title("3RD QUARTER FG% BY MINUTE / SHOT DISTANCE", fontsize = 20)
 plt.xlabel("MINUTES REMAINING", fontsize = 16)
 #plt.xticks(range(1996,2017,1))
 plt.ylabel("SHOT DISTANCE", fontsize = 16)
@@ -149,7 +167,7 @@ plt.yticks(range(0,55,5))
 
 ax4 = plt.subplot(414)
 sns.boxplot(data=qtr4, x='minutes_remaining', y='shot_distance', hue='shot_made_flag', palette = 'mako')
-plt.title("4TH QUARTER FGA BY MINUTE / SHOT DISTANCE", fontsize = 20)
+plt.title("4TH QUARTER FG% BY MINUTE / SHOT DISTANCE", fontsize = 20)
 plt.xlabel("MINUTES REMAINING", fontsize = 16)
 #plt.xticks(range(1996,2017,1))
 plt.ylabel("SHOT DISTANCE", fontsize = 16)
@@ -160,7 +178,7 @@ plt.yticks(range(0,55,5));
 plt.figure(figsize=(21,12))
 ax1 = plt.subplot(211)
 sns.boxplot(data=half1, x='minutes_remaining', y='shot_distance', hue='shot_made_flag', palette = 'mako')
-plt.title("1ST HALF - FGA BY MINUTE / SHOT DISTANCE", fontsize = 20)
+plt.title("1ST HALF - FG% BY MINUTE / SHOT DISTANCE", fontsize = 20)
 plt.xlabel("MINUTES REMAINING", fontsize = 16)
 #plt.xticks(range(1996,2017,1))
 plt.ylabel("SHOT DISTANCE", fontsize = 16)
@@ -168,59 +186,80 @@ plt.yticks(range(0,55,5))
 
 ax2 = plt.subplot(212)
 sns.boxplot(data=half2, x='minutes_remaining', y='shot_distance', hue='shot_made_flag', palette = 'mako')
-plt.title("2ND HALF - FGA BY MINUTE / SHOT DISTANCE", fontsize = 20)
+plt.title("2ND HALF - FG% BY MINUTE / SHOT DISTANCE", fontsize = 20)
 plt.xlabel("MINUTES REMAINING", fontsize = 16)
 #plt.xticks(range(1996,2017,1))
 plt.ylabel("SHOT DISTANCE", fontsize = 16)
 plt.yticks(range(0,55,5));
-
-#%%
-test_pct = pd.DataFrame(kobe_clean.groupby("shot_distance")["shot_made_flag"].mean())
-test_pct
 
 #%%
 # SHOOTING SPLITS - BY HALF [1-2] / MINUTES REMAINING [0-11]
 half1_pct = pd.DataFrame(half1.groupby("shot_distance")["shot_made_flag"].mean())
 half2_pct = pd.DataFrame(half2.groupby("shot_distance")["shot_made_flag"].mean())
 halves_pct = pd.concat([half1_pct, half2_pct], axis=1)
-halves_pct['diff'] = 
 halves_pct
 
 #%%
 # SHOOTING SPLITS - CLUTCHTIME [PERIODS 4-7] / <5 MINUTES
-
 plt.figure(figsize=(9,6))
 sns.boxplot(data=clutchtime_5min, x='minutes_remaining', y='shot_distance', hue='shot_made_flag', palette = 'mako')
-plt.title("CLUTCH-TIME FGA BY MINUTE / SHOT DISTANCE", fontsize = 20)
+plt.title("CLUTCH-TIME FG% BY MINUTE / SHOT DISTANCE", fontsize = 20)
 plt.xlabel("MINUTES REMAINING", fontsize = 16)
 #plt.xticks(range(1996,2017,1))
 plt.ylabel("SHOT DISTANCE", fontsize = 16)
 plt.yticks(range(0,55,5));
 
-#%% [markdown]
-### OBSERVATIONS:
-##### PERIOD
-    # * Shots Missed - mean shot distance increases as time goes on
-    # * Far greater level of success shooting from inside ~20ft
+#%%
+# SHOOTING SPLITS - CLUTCHTIME [PERIODS 4-7] / <5 MINUTES
+baseline_pct = pd.DataFrame(basetime.groupby("shot_distance")["shot_made_flag"].mean())
+clutch_5min_pct = pd.DataFrame(clutchtime_5min.groupby("shot_distance")["shot_made_flag"].mean())
+clutch_base_pct = pd.concat([baseline_pct, clutch_5min_pct], axis=1)
+clutch_base_pct
 
-##### MINUTES
-    # * TBU
+#%%
+# SHOOTING SPLITS - PLAYOFFS / REGULAR SEASON
+regular_splits = pd.DataFrame(regular.groupby("shot_distance")["shot_made_flag"].mean())
+playoffs_splits = pd.DataFrame(playoffs.groupby("shot_distance")["shot_made_flag"].mean())
+playoff_reg_splits = pd.concat([regular_splits, playoffs_splits], axis=1)
+playoff_reg_splits
 
-
-
-
-
-
+#%%
+# SHOOTING SPLITS - PLAYOFFS / REGULAR SEASON
+plt.figure(figsize=(12,12))
+sns.boxplot(data=playoffs, x='opponent', y='shot_distance', hue='shot_made_flag', palette = 'mako')
+plt.title("PLAYOFF FG% BY MINUTE / SHOT DISTANCE", fontsize = 20)
+plt.xlabel("PERIOD", fontsize = 16)
+#plt.xticks(range(1996,2017,1))
+plt.ylabel("SHOT DISTANCE", fontsize = 16)
+plt.yticks(range(0,55,5));
 
 #%%
 # FEATURE ENGINEERING
-kobe_szn_splits1 = kobe_clean.groupby(["game_year", "opponent"])[["shot_made_flag", "shot_distance"]].mean()
-kobe_szn_splits2 = kobe_clean.groupby("opponent")[["shot_made_flag", "shot_distance"]].mean()
-kobe_szn_splits3 = kobe_clean.groupby(["opponent"])[["shot_made_flag", "shot_distance"]].mean()
+#kobe_szn_splits1 = kobe_clean.groupby(["game_year", "opponent"])[["shot_made_flag", "shot_distance"]].mean()
+kobe_opp_splits = pd.DataFrame(kobe_clean.groupby("opponent")[["shot_made_flag", "shot_distance"]].mean()).sort_values(by="shot_made_flag", ascending=False)
+kobe_szn_splits3 = pd.DataFrame(kobe_clean.groupby("game_year")[["opponent", "shot_made_flag", "shot_distance"]].mean()).sort_values(by="shot_made_flag", ascending=False)
 
-print(kobe_szn_splits1)
+print(kobe_szn_splits3)
 #kobe_szn_splits2
 #kobe_szn_splits3
+
+#%%
+# FG% BY OPPONENT / SEASON
+plt.figure(figsize=(24,12))
+sns.barplot(data=kobe_clean, x='opponent', y='shot_made_flag', hue='game_year', palette='mako')
+plt.title("FG% BY SEASON / SHOT DISTANCE / OPPONENT", fontsize = 20)
+plt.xlabel("OPPONENT", fontsize = 16)
+#plt.xticks(range(1996,2017,1))
+plt.ylabel("FG%", fontsize = 16);
+
+#%%
+# FG% BY OPPONENT / SEASON
+plt.figure(figsize=(24,12))
+sns.barplot(data=kobe_opp_splits, x=kobe_opp_splits.index, y='shot_made_flag', palette='mako')
+plt.title("FG% BY SEASON / SHOT DISTANCE / OPPONENT", fontsize = 20)
+plt.xlabel("OPPONENT", fontsize = 16)
+#plt.xticks(range(1996,2017,1))
+plt.ylabel("FG%", fontsize = 16);
 
 #%%
 # SCRATCH - ADDING OPPONENT AVERAGES BY YEAR TO OG DATAFRAME
@@ -232,17 +271,7 @@ print(kobe_szn_splits1)
 # if kobe_clean['opponent'] == kobe_szn_splits1['opponent'] & :
 #kobe_clean.head()
 
-#%%
-kobe_szn_splits1.index
 
-#%%
-# FG% BY OPPONENT / SEASON
-plt.figure(figsize=(24,12))
-sns.barplot(data=kobe_clean, x='opponent', y='shot_made_flag', hue='game_year')
-plt.title("FG% BY SEASON / SHOT DISTANCE / OPPONENT", fontsize = 20)
-plt.xlabel("OPPONENT", fontsize = 16)
-#plt.xticks(range(1996,2017,1))
-plt.ylabel("FG%", fontsize = 16);
 
 
 #%%
