@@ -1,6 +1,7 @@
 #%%
 # LIBRARY IMPORTS
 import os
+from matplotlib import colors
 
 import pandas as pd
 import numpy as np
@@ -166,6 +167,11 @@ combined_accuracy.columns = ["success rate", "count"]
 combined_accuracy
 #%%
 #### jump shot #####
+jump_accuracy = kobe_jump.groupby("shot_zone_range")["shot_made_flag"].agg(["mean", "count"]).sort_values("mean", ascending=False)
+jump_accuracy.columns = ["success rate", "count"]
+# combined_accuracy = combined_accuracy.reset_index()
+jump_accuracy
+#%%
 plt.subplots(figsize=(13,11))
 draw_court(outer_lines=True)
 ax1 = sns.scatterplot(x="loc_x", y="loc_y", hue="shot_made_flag", palette={0:"red",1:"green"}, data=kobe_jump, alpha=0.6)
@@ -199,6 +205,11 @@ plt.xlim(300,-300)
 plt.show()
 # %%
 #### layup #####
+layup_accuracy = kobe_layup.groupby("shot_made_flag").agg(["count"])
+# layup_accuracy.columns = ["success rate", "count"]
+# combined_accuracy = combined_accuracy.reset_index()
+layup_accuracy
+#%%
 plt.subplots(figsize=(8,6))
 draw_court(outer_lines=True)
 ax4 = sns.scatterplot(x="loc_x", y="loc_y", hue="shot_made_flag", palette={0:"red",1:"green"}, data=kobe_layup, alpha=0.5)
@@ -251,7 +262,7 @@ sns.scatterplot(x="loc_x", y="loc_y", hue="shot_zone_area",style="shot_made_flag
 
 plt.legend(bbox_to_anchor=(1, 1))
 plt.title("Shot Zone Area")
-plt.ylim(-100,500)
+plt.ylim(-100,600)
 plt.xlim(300,-300)
 plt.show()
 # %%
@@ -287,21 +298,17 @@ sns.scatterplot(x="loc_x", y="loc_y", hue="shot_zone_range",style="shot_made_fla
 
 plt.legend(bbox_to_anchor=(1, 1))
 plt.title("Shot Zone Range")
-plt.ylim(-100,500)
+plt.ylim(-100,900)
 plt.xlim(300,-300)
 plt.show()
 # %%
 ####### Accuracy vs Distance #######
-distance_accuracy = kobe_spatial.groupby("action_type")["shot_made_flag"].agg(["mean", "count"]).sort_values("count", ascending=False)
-action_accuracy = action_accuracy.reset_index()
-action_accuracy
-#%%
 plt.subplots(figsize=(8,8))
-sns.lmplot(x="shot_distance", y="shot_made_flag",data=kobe_spatial,y_jitter=0.02, logistic=True)
+sns.lmplot(x="shot_distance", y="shot_made_flag",data=kobe_spatial[kobe_spatial.shot_distance < 50],y_jitter=0.02, logistic=True, palette="Blue_r")
 
-plt.legend(bbox_to_anchor=(1, 1))
 plt.title("Accuracy vs Distance")
+plt.xlim(0,55)
 plt.ylabel("Succeed")
-plt.xlabel("Distance")
+plt.xlabel("Distance(ft)")
 plt.show()
 # %%
