@@ -67,8 +67,7 @@ kobe_clean.info()
 
 # EJECT OUTLIERS
 kobe_clean = kobe_clean[(kobe_clean['shot_distance'] <= 50)]
-kobe_clean['shot_distance'].unique()
-
+#kobe_clean['shot_distance'].unique()
 
 #%%
 kobe_clean.columns
@@ -90,6 +89,8 @@ qtr1 = kobe_clean[(kobe_clean['period'] == 1)]
 qtr2 = kobe_clean[(kobe_clean['period'] == 2)]
 qtr3 = kobe_clean[(kobe_clean['period'] == 3)]
 qtr4 = kobe_clean[(kobe_clean['period'] == 4)]
+half1 = kobe_clean[(kobe_clean['period'] >= 1) & (kobe_clean['period'] <= 2)]
+half2 = kobe_clean[(kobe_clean['period'] >= 3) & (kobe_clean['period'] <= 4)]
 overtime = kobe_clean[(kobe_clean['period'] >= 5)]
 
 basetime = kobe_clean[(kobe_clean['period'] <= 4)]
@@ -97,20 +98,17 @@ clutchtime_1min = kobe_clean[(kobe_clean['period'] >= 4) & (kobe_clean['minutes_
 clutchtime_2min = kobe_clean[(kobe_clean['period'] >= 4) & (kobe_clean['minutes_remaining'] <= 2)]
 clutchtime_5min = kobe_clean[(kobe_clean['period'] >= 4) & (kobe_clean['minutes_remaining'] <= 5)]
 
-#playoff_clutchtime = 
-#%%
-kobe_clean['minutes_remaining'].unique()
+#playoffs= 
 
 #%%
 # SHOOTING SPLITS - BY PERIOD [1-7]
-plt.figure(figsize=(12,12))
+plt.figure(figsize=(9,9))
 sns.boxplot(data=kobe_clean, x='period', y='shot_distance', hue='shot_made_flag', palette = 'mako')
 plt.title("FIELD GOAL ATTEMPTS BY PERIOD / SHOT DISTANCE", fontsize = 20)
 plt.xlabel("PERIOD", fontsize = 16)
 #plt.xticks(range(1996,2017,1))
 plt.ylabel("SHOT DISTANCE", fontsize = 16)
 plt.yticks(range(0,55,5));
-
 
 #%%
 # SHOOTING SPLITS - BY MINUTES REMAINING [0-11]
@@ -122,7 +120,82 @@ plt.xlabel("MINUTES REMAINING", fontsize = 16)
 plt.ylabel("SHOT DISTANCE", fontsize = 16)
 plt.yticks(range(0,55,5));
 
-#plt.savefig('/Users/nehat312/kobe-shot-predictor/images/FGA_by_min.png')
+#%%
+# SHOOTING SPLITS - BY QUARTER [1-4] / MINUTES REMAINING [0-11]
+plt.figure(figsize=(24,30))
+ax1 = plt.subplot(411)
+sns.boxplot(data=qtr1, x='minutes_remaining', y='shot_distance', hue='shot_made_flag', palette = 'mako')
+plt.title("1ST QUARTER FGA BY MINUTE / SHOT DISTANCE", fontsize = 20)
+plt.xlabel("MINUTES REMAINING", fontsize = 16)
+#plt.xticks(range(1996,2017,1))
+plt.ylabel("SHOT DISTANCE", fontsize = 16)
+plt.yticks(range(0,55,5))
+
+ax2 = plt.subplot(412)
+sns.boxplot(data=qtr2, x='minutes_remaining', y='shot_distance', hue='shot_made_flag', palette = 'mako')
+plt.title("2ND QUARTER FGA BY MINUTE / SHOT DISTANCE", fontsize = 20)
+plt.xlabel("MINUTES REMAINING", fontsize = 16)
+#plt.xticks(range(1996,2017,1))
+plt.ylabel("SHOT DISTANCE", fontsize = 16)
+plt.yticks(range(0,55,5))
+
+ax3 = plt.subplot(413)
+sns.boxplot(data=qtr3, x='minutes_remaining', y='shot_distance', hue='shot_made_flag', palette = 'mako')
+plt.title("3RD QUARTER FGA BY MINUTE / SHOT DISTANCE", fontsize = 20)
+plt.xlabel("MINUTES REMAINING", fontsize = 16)
+#plt.xticks(range(1996,2017,1))
+plt.ylabel("SHOT DISTANCE", fontsize = 16)
+plt.yticks(range(0,55,5))
+
+ax4 = plt.subplot(414)
+sns.boxplot(data=qtr4, x='minutes_remaining', y='shot_distance', hue='shot_made_flag', palette = 'mako')
+plt.title("4TH QUARTER FGA BY MINUTE / SHOT DISTANCE", fontsize = 20)
+plt.xlabel("MINUTES REMAINING", fontsize = 16)
+#plt.xticks(range(1996,2017,1))
+plt.ylabel("SHOT DISTANCE", fontsize = 16)
+plt.yticks(range(0,55,5));
+
+#%%
+# SHOOTING SPLITS - BY HALF [1-2] / MINUTES REMAINING [0-11]
+plt.figure(figsize=(21,12))
+ax1 = plt.subplot(211)
+sns.boxplot(data=half1, x='minutes_remaining', y='shot_distance', hue='shot_made_flag', palette = 'mako')
+plt.title("1ST HALF - FGA BY MINUTE / SHOT DISTANCE", fontsize = 20)
+plt.xlabel("MINUTES REMAINING", fontsize = 16)
+#plt.xticks(range(1996,2017,1))
+plt.ylabel("SHOT DISTANCE", fontsize = 16)
+plt.yticks(range(0,55,5))
+
+ax2 = plt.subplot(212)
+sns.boxplot(data=half2, x='minutes_remaining', y='shot_distance', hue='shot_made_flag', palette = 'mako')
+plt.title("2ND HALF - FGA BY MINUTE / SHOT DISTANCE", fontsize = 20)
+plt.xlabel("MINUTES REMAINING", fontsize = 16)
+#plt.xticks(range(1996,2017,1))
+plt.ylabel("SHOT DISTANCE", fontsize = 16)
+plt.yticks(range(0,55,5));
+
+#%%
+test_pct = pd.DataFrame(kobe_clean.groupby("shot_distance")["shot_made_flag"].mean())
+test_pct
+
+#%%
+# SHOOTING SPLITS - BY HALF [1-2] / MINUTES REMAINING [0-11]
+half1_pct = pd.DataFrame(half1.groupby("shot_distance")["shot_made_flag"].mean())
+half2_pct = pd.DataFrame(half2.groupby("shot_distance")["shot_made_flag"].mean())
+halves_pct = pd.concat([half1_pct, half2_pct], axis=1)
+halves_pct['diff'] = 
+halves_pct
+
+#%%
+# SHOOTING SPLITS - CLUTCHTIME [PERIODS 4-7] / <5 MINUTES
+
+plt.figure(figsize=(9,6))
+sns.boxplot(data=clutchtime_5min, x='minutes_remaining', y='shot_distance', hue='shot_made_flag', palette = 'mako')
+plt.title("CLUTCH-TIME FGA BY MINUTE / SHOT DISTANCE", fontsize = 20)
+plt.xlabel("MINUTES REMAINING", fontsize = 16)
+#plt.xticks(range(1996,2017,1))
+plt.ylabel("SHOT DISTANCE", fontsize = 16)
+plt.yticks(range(0,55,5));
 
 #%% [markdown]
 ### OBSERVATIONS:
@@ -132,6 +205,12 @@ plt.yticks(range(0,55,5));
 
 ##### MINUTES
     # * TBU
+
+
+
+
+
+
 
 #%%
 # FEATURE ENGINEERING
