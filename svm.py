@@ -25,26 +25,26 @@ Y_train = Y[:num_train]
 Y_test = Y[num_train:]
 
 # %%
-from sklearn.tree import DecisionTreeClassifier
-decision_tree = DecisionTreeClassifier()
-decision_tree.fit(X_train, Y_train)
+from sklearn import svm
+svm = svm.SVC(kernel='linear')
+svm.fit(X_train[:1000], Y_train[:1000])
 
 #%%
 # get importance
-feature_importance = pd.DataFrame({'feature': X.columns, 'importance': decision_tree.feature_importances_})
+feature_importance = pd.DataFrame({'feature': X.columns, 'importance': svm.coef_[0]})
 top_features = feature_importance.sort_values(by=['importance'], ascending=False).head(10)
 sns.barplot(x='importance', y = 'feature', data = top_features)
-
 # %%
 from sklearn.metrics import accuracy_score, precision_score, recall_score
-Y_pred = decision_tree.predict(X_test)
+Y_pred = svm.predict(X_test)
 print('Accuracy:', accuracy_score(Y_test, Y_pred))
 print('Precision:', precision_score(Y_test, Y_pred))
 print('Recall:', recall_score(Y_test, Y_pred))
 
+
 # %%
 from sklearn.metrics import plot_confusion_matrix
-plot_confusion_matrix(decision_tree, X_test, Y_test)
+plot_confusion_matrix(svm, X_test, Y_test)
 # %%
 
 # %%
