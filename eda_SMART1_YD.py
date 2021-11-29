@@ -106,7 +106,7 @@ def draw_court(ax=None, color='black', lw=2, outer_lines=False):
 #%%
 # define subsets
 kobe_spatial = kobe_clean[["loc_x", "loc_y", "action_type", "combined_shot_type", "shot_zone_area", "shot_type", "shot_zone_basic", "shot_zone_range", "shot_distance", "shot_made_flag"]].copy()
-kobe_spatial = kobe_spatial[kobe_spatial["action_type"]!=kobe_spatial["combined_shot_type"]]
+# kobe_spatial = kobe_spatial[kobe_spatial["action_type"]!=kobe_spatial["combined_shot_type"]]
 kobe_jump = kobe_spatial[kobe_spatial.combined_shot_type=="Jump Shot"]
 kobe_dunk = kobe_spatial[kobe_spatial.combined_shot_type=="Dunk"]
 kobe_layup = kobe_spatial[kobe_spatial.combined_shot_type=="Layup"]
@@ -121,8 +121,10 @@ kobe_action.action_type = kobe_action.action_type.apply(lambda x:x.lower().repla
 
 
 #%%
+############### Action Type ##################
 ####### Action Type Success Rate #######
 action_accuracy = kobe_action.groupby("action_type")["shot_made_flag"].agg(["mean", "count"]).sort_values("count", ascending=False)
+action_accuracy.columns = ["success rate", "count"]
 action_accuracy = action_accuracy.reset_index()
 action_accuracy
 #%%
@@ -134,6 +136,7 @@ sns.scatterplot(x=action_accuracy.index, y="mean", size="count", sizes=(5, 1583)
 for i in [0,1,3,6,8]:
         plt.text(i, action_accuracy["mean"][i], action_accuracy.action_type[i], fontdict=dict(color="blue", alpha=0.5, size=16))
 plt.text(2, action_accuracy["mean"][2], "layup", fontdict=dict(color="blue", alpha=0.5, size=16), ha="center")
+plt.text(5-0.4, action_accuracy["mean"][5]+0.01, action_accuracy.action_type[5], fontdict=dict(color="blue", alpha=0.5, size=16))
 
 plt.legend(bbox_to_anchor=(1, 1))
 plt.title("Shot Accuracy for Each Action Type")
@@ -144,7 +147,7 @@ plt.legend().remove()
 plt.tight_layout()
 plt.show()
 #%%
-############### Action Type ##################
+
 # fig, ax = plt.subplots(figsize=(9, 6))
 # draw_court(outer_lines=True)
 # sns.scatterplot(x="loc_x", y="loc_y", hue="action_type", style="shot_made_flag", markers={0:"X", 1:"o"}, data=kobe_spatial, alpha=0.7)
@@ -155,11 +158,17 @@ plt.show()
 # plt.xlim(300,-300)
 # plt.show()
 # %%
-############# combined shot type ################
+############# Combined Shot Type ################
+####### Combined Shot Type Success Rate #######
+combined_accuracy = kobe_action.groupby("combined_shot_type")["shot_made_flag"].agg(["mean", "count"]).sort_values("mean", ascending=False)
+combined_accuracy.columns = ["success rate", "count"]
+# combined_accuracy = combined_accuracy.reset_index()
+combined_accuracy
+#%%
 #### jump shot #####
 plt.subplots(figsize=(13,11))
 draw_court(outer_lines=True)
-sns.scatterplot(x="loc_x", y="loc_y", hue="shot_made_flag", palette={0:"red",1:"green"}, data=kobe_jump, alpha=0.7)
+ax1 = sns.scatterplot(x="loc_x", y="loc_y", hue="shot_made_flag", palette={0:"red",1:"green"}, data=kobe_jump, alpha=0.6)
 # sns.scatterplot(x="loc_x", y="loc_y", hue="shot_zone_basic", style="shot_made_flag", markers={0:"X", 1:"o"}, data=kobe_jump, alpha=0.7)
 plt.legend(bbox_to_anchor=(1, 1))
 plt.title("Jump Shot")
@@ -170,7 +179,7 @@ plt.show()
 #### bank shot #####
 plt.subplots(figsize=(8,6))
 draw_court(outer_lines=True)
-sns.scatterplot(x="loc_x", y="loc_y", hue="shot_made_flag", palette={0:"red",1:"green"}, data=kobe_bank, alpha=0.7)
+ax2 = sns.scatterplot(x="loc_x", y="loc_y", hue="shot_made_flag", palette={0:"red",1:"green"}, data=kobe_bank, alpha=0.7)
 
 # plt.legend(bbox_to_anchor=(1, 1))
 plt.title("Bank Shot")
@@ -181,7 +190,7 @@ plt.show()
 #### hook shot #####
 plt.subplots(figsize=(8,6))
 draw_court(outer_lines=True)
-sns.scatterplot(x="loc_x", y="loc_y", hue="shot_made_flag", palette={0:"red",1:"green"}, data=kobe_hook, alpha=0.7)
+ax3 = sns.scatterplot(x="loc_x", y="loc_y", hue="shot_made_flag", palette={0:"red",1:"green"}, data=kobe_hook, alpha=0.7)
 
 # plt.legend(bbox_to_anchor=(1, 1))
 plt.title("Hook Shot")
@@ -192,7 +201,7 @@ plt.show()
 #### layup #####
 plt.subplots(figsize=(8,6))
 draw_court(outer_lines=True)
-sns.scatterplot(x="loc_x", y="loc_y", hue="shot_made_flag", palette={0:"red",1:"green"}, data=kobe_layup, alpha=0.5)
+ax4 = sns.scatterplot(x="loc_x", y="loc_y", hue="shot_made_flag", palette={0:"red",1:"green"}, data=kobe_layup, alpha=0.5)
 
 # plt.legend(bbox_to_anchor=(1, 1))
 plt.title("Layup")
@@ -200,21 +209,21 @@ plt.ylim(-100,500)
 plt.xlim(300,-300)
 plt.show()
 # %%
-#### tip ##### only one entry
-# plt.subplots(figsize=(8,6))
-# draw_court(outer_lines=True)
-# sns.scatterplot(x="loc_x", y="loc_y", hue="shot_made_flag", palette={0:"red",1:"green"}, data=kobe_tip, alpha=0.7)
+#### tip ##### 
+plt.subplots(figsize=(8,6))
+draw_court(outer_lines=True)
+sns.scatterplot(x="loc_x", y="loc_y", hue="shot_made_flag", palette={0:"red",1:"green"}, data=kobe_tip, alpha=0.7)
 
-# # plt.legend(bbox_to_anchor=(1, 1))
-# plt.title("Tip Shot")
-# plt.ylim(-100,500)
-# plt.xlim(300,-300)
-# plt.show()
+# plt.legend(bbox_to_anchor=(1, 1))
+plt.title("Tip Shot")
+plt.ylim(-100,500)
+plt.xlim(300,-300)
+plt.show()
 # %%
 #### dunk shot #####
 plt.subplots(figsize=(8,6))
 draw_court(outer_lines=True)
-sns.scatterplot(x="loc_x", y="loc_y", hue="shot_made_flag", palette={0:"red",1:"green"}, data=kobe_dunk, alpha=0.7)
+ax5 = sns.scatterplot(x="loc_x", y="loc_y", hue="shot_made_flag", palette={0:"red",1:"green"}, data=kobe_dunk, alpha=0.7)
 
 # plt.legend(bbox_to_anchor=(1, 1))
 plt.title("Dunk Shot")
@@ -229,6 +238,13 @@ plt.show()
 
 # %%
 ############# shot_zone_area ################
+####### Success Rate #######
+area_accuracy = kobe_spatial.groupby("shot_zone_area")["shot_made_flag"].agg(["mean", "count"]).sort_values("mean", ascending=False)
+area_accuracy.columns = ["success rate", "count"]
+# combined_accuracy = combined_accuracy.reset_index()
+area_accuracy
+#%%
+####### Plot #######
 plt.subplots(figsize=(8,8))
 draw_court(outer_lines=True)
 sns.scatterplot(x="loc_x", y="loc_y", hue="shot_zone_area",style="shot_made_flag", markers={0:"X", 1:"o"}, data=kobe_spatial, alpha=0.7)
@@ -240,6 +256,13 @@ plt.xlim(300,-300)
 plt.show()
 # %%
 ############# shot_zone_basic ################
+####### Success Rate #######
+basic_accuracy = kobe_spatial.groupby("shot_zone_basic")["shot_made_flag"].agg(["mean", "count"]).sort_values("mean", ascending=False)
+basic_accuracy.columns = ["success rate", "count"]
+# combined_accuracy = combined_accuracy.reset_index()
+basic_accuracy
+#%%
+####### Plot #######
 plt.subplots(figsize=(8,8))
 draw_court(outer_lines=True)
 sns.scatterplot(x="loc_x", y="loc_y", hue="shot_zone_basic",style="shot_made_flag", markers={0:"X", 1:"o"}, data=kobe_spatial, alpha=0.7)
@@ -251,6 +274,13 @@ plt.xlim(300,-300)
 plt.show()
 # %%
 ############# shot_zone_range and distance ################
+####### Success Rate #######
+range_accuracy = kobe_spatial.groupby("shot_zone_range")["shot_made_flag"].agg(["mean", "count"]).sort_values("mean", ascending=False)
+range_accuracy.columns = ["success rate", "count"]
+# combined_accuracy = combined_accuracy.reset_index()
+range_accuracy
+#%%
+####### Plot #######
 plt.subplots(figsize=(8,8))
 draw_court(outer_lines=True)
 sns.scatterplot(x="loc_x", y="loc_y", hue="shot_zone_range",style="shot_made_flag", markers={0:"X", 1:"o"}, data=kobe_spatial, alpha=0.7)
