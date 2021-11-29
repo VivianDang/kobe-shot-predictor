@@ -105,26 +105,33 @@ kobe_clean['minutes_remaining'].unique()
 # SHOOTING SPLITS - BY PERIOD [1-7]
 plt.figure(figsize=(12,12))
 sns.boxplot(data=kobe_clean, x='period', y='shot_distance', hue='shot_made_flag', palette = 'mako')
-plt.title("KOBE - SHOOTING BY PERIOD", fontsize = 20)
+plt.title("FIELD GOAL ATTEMPTS BY PERIOD / SHOT DISTANCE", fontsize = 20)
 plt.xlabel("PERIOD", fontsize = 16)
 #plt.xticks(range(1996,2017,1))
 plt.ylabel("SHOT DISTANCE", fontsize = 16)
 plt.yticks(range(0,55,5));
 
-#%% [markdown]
-### OBSERVATIONS:
-    # * Shots Missed - mean shot distance increases as time goes on
-    # * Far greater level of success shooting from inside ~20ft
 
 #%%
 # SHOOTING SPLITS - BY MINUTES REMAINING [0-11]
 plt.figure(figsize=(24,12))
 sns.boxplot(data=kobe_clean, x='minutes_remaining', y='shot_distance', hue='shot_made_flag', palette = 'mako')
-plt.title("KOBE - SHOOTING BY MINUTE", fontsize = 20)
+plt.title("FIELD GOAL ATTEMPTS BY MINUTE / SHOT DISTANCE", fontsize = 20)
 plt.xlabel("MINUTES REMAINING", fontsize = 16)
 #plt.xticks(range(1996,2017,1))
 plt.ylabel("SHOT DISTANCE", fontsize = 16)
 plt.yticks(range(0,55,5));
+
+#plt.savefig('/Users/nehat312/kobe-shot-predictor/images/FGA_by_min.png')
+
+#%% [markdown]
+### OBSERVATIONS:
+##### PERIOD
+    # * Shots Missed - mean shot distance increases as time goes on
+    # * Far greater level of success shooting from inside ~20ft
+
+##### MINUTES
+    # * TBU
 
 #%%
 # FEATURE ENGINEERING
