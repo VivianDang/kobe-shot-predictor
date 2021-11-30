@@ -38,3 +38,5 @@ from scipy.stats import ttest_ind
 ttest_ind(df[df['made_last_shot']==1]['shot_made_flag'], df[df['made_last_shot']==0]['shot_made_flag'])
 
 # No significant difference == no hot hand effect
+
+# %%
