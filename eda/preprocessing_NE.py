@@ -75,9 +75,6 @@ kobe_clean = kobe_clean[(kobe_clean['shot_distance'] <= 30)]
 kobe_clean.info()
 
 #%%
-kobe_clean['opponent'].unique()
-
-#%%
 numerical_features = ['loc_x', 'loc_y', 'minutes_remaining', 'period', 'shot_distance']
 categorical_features = ['combined_shot_type', 'playoffs','shot_zone_area', 'shot_zone_basic', 'shot_zone_range', 'opponent']
 
@@ -134,27 +131,24 @@ szn_2016 = kobe_clean[(kobe_clean['game_year'] == 2016)]
 
 print("\nVARIABLES ASSIGNED")
 
-#%%
-szn_2012
-
 #%% [markdown]
 ### SITUATIONAL STATISTICS
 
 #%%
-pal1 = {0:'#fdb927', 1:'#552583'}
+# SHOOTING SPLITS - QUARTERS
 sns.set(style="darkgrid")
 fig, axs = plt.subplots(2, 2, figsize=(12,9))
-sns.histplot(data=qtr1, x="shot_distance", kde=True, color="#fdb927", ax=axs[0, 0])
-sns.histplot(data=qtr2, x="shot_distance", kde=True, color="#552583", ax=axs[0, 1])
-sns.histplot(data=qtr3, x="shot_distance", kde=True, color="deepskyblue", ax=axs[1, 0])
-sns.histplot(data=qtr4, x="shot_distance", kde=True, color="dimgrey", ax=axs[1, 1])
-
-plt.show()
+ax1 = sns.histplot(data=qtr1, x="shot_distance", kde=True, color="#fdb927", ax=axs[0, 0])
+ax2 = sns.histplot(data=qtr2, x="shot_distance", kde=True, color="#552583", ax=axs[0, 1])
+ax3 = sns.histplot(data=qtr3, x="shot_distance", kde=True, color="#fdb927", ax=axs[1, 0])
+ax4 = sns.histplot(data=qtr4, x="shot_distance", kde=True, color="#552583", ax=axs[1, 1])
+plt.yticks(range(0,1600,200));
 
 #%%
 # SHOOTING SPLITS - BY PERIOD [1-7]
+pal1 = {0:'#fdb927', 1:'#552583'}
 plt.figure(figsize=(12,9))
-sns.boxplot(data=kobe_clean, x='period', y='shot_distance', hue='shot_made_flag', color = 'gold')
+sns.boxplot(data=kobe_clean, x='period', y='shot_distance', hue='shot_made_flag', palette=pal1)
 plt.title("FIELD GOAL ATTEMPTS BY PERIOD / SHOT DISTANCE", fontsize = 20)
 plt.xlabel("PERIOD", fontsize = 16)
 #plt.xticks(range(1996,2017,1))
@@ -173,8 +167,9 @@ qtrs_pct.describe()
 
 #%%
 # SHOOTING SPLITS - BY MINUTES REMAINING [0-11]
+pal1 = {0:'#fdb927', 1:'#552583'}
 plt.figure(figsize=(12,9))
-sns.boxplot(data=kobe_clean, x='minutes_remaining', y='shot_distance', hue='shot_made_flag', color='gold')
+sns.boxplot(data=kobe_clean, x='minutes_remaining', y='shot_distance', hue='shot_made_flag', palette=pal1)
 plt.title("FG% BY MINUTE / SHOT DISTANCE", fontsize = 20)
 plt.xlabel("MINUTES REMAINING", fontsize = 16)
 #plt.xticks(range(1996,2017,1))
@@ -190,8 +185,9 @@ halves_pct.describe()
 
 #%%
 # SHOOTING SPLITS - CLUTCHTIME [PERIODS 4-7] / <5 MINUTES
+pal1 = {0:'#fdb927', 1:'#552583'}
 plt.figure(figsize=(12,9))
-sns.boxplot(data=clutchtime_5min, x='minutes_remaining', y='shot_distance', hue='shot_made_flag', color='gold')
+sns.boxplot(data=clutchtime_5min, x='minutes_remaining', y='shot_distance', hue='shot_made_flag', palette=pal1)
 plt.title("CLUTCH-TIME FG%", fontsize = 20)
 plt.xlabel("MINUTES REMAINING", fontsize = 16)
 #plt.xticks(range(1996,2017,1))
@@ -208,7 +204,6 @@ clutch_base_pct.describe()
 #%%
 # SHOOTING SPLITS - HOME / AWAY
 pal1 = {0:'#fdb927', 1:'#552583'}
-
 plt.figure(figsize=(12,9))
 sns.lineplot(data=kobe_clean, x='shot_distance', y='shot_made_flag', hue='home', style='home', legend=True, markers = True, palette=pal1)
 plt.title("HOME/AWAY FG%", fontsize = 20)
@@ -227,7 +222,6 @@ home_away_pct.describe()
 #%%
 # SHOOTING SPLITS - PLAYOFFS / REGULAR SEASON
 pal1 = {0:'#fdb927', 1:'#552583'}
-
 plt.figure(figsize=(12,9))
 sns.lineplot(data=kobe_clean, x='shot_distance', y='shot_made_flag', hue='playoffs', style='playoffs', legend=True, markers = True, palette=pal1)
 plt.title("PLAYOFFS / REGULAR SEASON FG%", fontsize = 20)
@@ -274,14 +268,8 @@ yearly_splits
 #%%
 # OPPONENT FILTERING / SORTING
 kobe_opp_splits = pd.DataFrame(kobe_clean.groupby("opponent")[["shot_made_flag", "shot_distance"]].mean()).sort_values(by="shot_made_flag", ascending=False)
-kobe_opp_splits2 = pd.DataFrame(kobe_clean.groupby("opponent", "game_year")[["shot_made_flag", "shot_distance"]].mean()).sort_values(by="shot_made_flag", ascending=False)
+#kobe_opp_splits2 = pd.DataFrame(kobe_clean.groupby("opponent", "game_year")[["shot_made_flag", "shot_distance"]].mean()).sort_values(by="shot_made_flag", ascending=False)
 #kobe_opp_splits3 = pd.DataFrame(kobe_clean.groupby("opponent")[["shot_made_flag", "shot_distance", "game_year"]])
-
-kobe_opp_splits3.head()
-
-#%%
-kobe_clean['game_year'].unique()
-
 
 #%%
 # FG% BY OPPONENT
@@ -297,11 +285,35 @@ plt.ylabel("OPPONENT", fontsize = 16);
 # FG% BY OPPONENT / H/A
 pal_opps = {'#fdb927', '#552583'}
 plt.figure(figsize=(18,9))
-sns.barplot(data=kobe_clean, x='shot_made_flag', y='opponent', hue='game_year', palette=pal_opps)
+sns.violinplot(data = yearly_splits, palette=pal_opps, legend=True)
 plt.title("FG% BY OPPONENT", fontsize = 20)
 plt.xlabel("FG%", fontsize = 16)
 #plt.xticks(range(1996,2017,1))
-plt.ylabel("OPPONENT", fontsize = 16);
+plt.ylabel("OPPONENT", fontsize = 16)
+plt.legend(loc='best');
+
+#%%
+# TEAMS BY SEASON
+pal1 = {0:'#fdb927', 1:'#552583'}
+fig, axs = plt.subplots(2, 2, figsize=(24,18))
+ax1 = sns.scatterplot(data=szn_1998, x="shot_distance", y="opponent", hue='shot_made_flag', palette=pal1, ax=axs[0, 0])
+ax2 = sns.barplot(data=szn_1999, x="shot_made_flag", y="opponent", color="#552583", ax=axs[0, 1])
+ax3 = sns.barplot(data=szn_2000, x="shot_made_flag", y="opponent", color="#fdb927", ax=axs[1, 0])
+ax4 = sns.barplot(data=szn_2001, x="shot_made_flag", y="opponent", color="#552583", ax=axs[1, 1])
+#plt.xticks(range(1996,2017,1))
+#plt.yticks(range(0,1600,200))
+plt.show();
+#%%
+# TEAMS BY SEASON
+pal1 = {0:'#fdb927', 1:'#552583'}
+fig, axs = plt.subplots(2, 2, figsize=(24,18))
+ax1 = sns.scatterplot(data=szn_1998, x="shot_distance", y="opponent", hue='shot_made_flag', palette=pal1, ax=axs[0, 0])
+ax2 = sns.barplot(data=szn_1999, x="shot_made_flag", y="opponent", color="#552583", ax=axs[0, 1])
+ax3 = sns.barplot(data=szn_2000, x="shot_made_flag", y="opponent", color="#fdb927", ax=axs[1, 0])
+ax4 = sns.barplot(data=szn_2001, x="shot_made_flag", y="opponent", color="#552583", ax=axs[1, 1])
+#plt.xticks(range(1996,2017,1))
+#plt.yticks(range(0,1600,200))
+plt.show();
 
 
 
@@ -319,17 +331,6 @@ plt.ylabel("FIELD GOAL %", fontsize = 16);
 
 
 #%%
-# SHOOTING SPLITS - OPPONENT
-plt.figure(figsize=(18,9))
-sns.barplot(data=kobe_clean, x='shot_made_flag', y='opponent', palette='mako')
-plt.title("PLAYOFF FG% BY MINUTE / SHOT DISTANCE", fontsize = 20)
-plt.xlabel("PERIOD", fontsize = 16)
-plt.xticks(range(1996,2017,1))
-plt.ylabel("SHOT DISTANCE", fontsize = 16)
-#plt.yticks(range(0,40,5));
-
-
-#%%
 # HEATMAP - correlation generated to visualize target / variable relationships
 kobe_corr = kobe_clean.corr()[['shot_made_flag']].sort_values('shot_made_flag', ascending=False)
 plt.figure(figsize=(12,15))
@@ -343,13 +344,5 @@ sns.heatmap(kobe_corr, annot = True, cmap = 'mako', vmin=-1, vmax=1, linecolor =
 
 
 
-
-
 #%%
-# TRAIN-TEST/SPLIT
-X = pd.concat([kobe_clean[numerical_features], kobe_categorical_one_hot], axis=1)
-Y = kobe_clean['shot_made_flag']
-
-
-#%%
-print("\nANALYSIS CONCLUSION")
+print("\nEDA CONCLUSION")
