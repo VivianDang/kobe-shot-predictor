@@ -293,29 +293,50 @@ plt.ylabel("OPPONENT", fontsize = 16)
 plt.legend(loc='best');
 
 #%%
-# TEAMS BY SEASON
-pal1 = {0:'#fdb927', 1:'#552583'}
-fig, axs = plt.subplots(2, 2, figsize=(24,18))
-ax1 = sns.scatterplot(data=szn_1998, x="shot_distance", y="opponent", hue='shot_made_flag', palette=pal1, ax=axs[0, 0])
-ax2 = sns.barplot(data=szn_1999, x="shot_made_flag", y="opponent", color="#552583", ax=axs[0, 1])
-ax3 = sns.barplot(data=szn_2000, x="shot_made_flag", y="opponent", color="#fdb927", ax=axs[1, 0])
-ax4 = sns.barplot(data=szn_2001, x="shot_made_flag", y="opponent", color="#552583", ax=axs[1, 1])
-#plt.xticks(range(1996,2017,1))
-#plt.yticks(range(0,1600,200))
-plt.show();
+yearly_splits.columns
+
 #%%
-# TEAMS BY SEASON
+# OPPONENT - BY SEASON
+#pal1 = {0:'#fdb927', 1:'#552583'}
+pal_opps = {'#fdb927', '#552583'}
+plt.figure(figsize=(18,9))
+sns.swarmplot(data=yearly_splits, palette=pal_opps)
+plt.title("AVG. FG% VS. OPPONENT (BY YEAR)", fontsize = 20)
+plt.xlabel("YEAR", fontsize = 16)
+#plt.xticks(range(1996,2017,1))
+plt.ylabel("FG%", fontsize = 16)
+plt.legend(loc='best');
+
+#plt.xticks(range(1996,2017,1))
+#plt.yticks(range(0,1600,200))
+
+#%%
+# OPPONENT - BY SEASON
 pal1 = {0:'#fdb927', 1:'#552583'}
 fig, axs = plt.subplots(2, 2, figsize=(24,18))
-ax1 = sns.scatterplot(data=szn_1998, x="shot_distance", y="opponent", hue='shot_made_flag', palette=pal1, ax=axs[0, 0])
-ax2 = sns.barplot(data=szn_1999, x="shot_made_flag", y="opponent", color="#552583", ax=axs[0, 1])
-ax3 = sns.barplot(data=szn_2000, x="shot_made_flag", y="opponent", color="#fdb927", ax=axs[1, 0])
-ax4 = sns.barplot(data=szn_2001, x="shot_made_flag", y="opponent", color="#552583", ax=axs[1, 1])
+ax1 = sns.barplot(data=szn_1998, x="shot_distance", y="opponent", hue='shot_made_flag', palette=pal1, ax=axs[0, 0])
+ax2 = sns.barplot(data=szn_1999, x="shot_distance", y="opponent", hue='shot_made_flag', palette=pal1, ax=axs[0, 1])
+ax3 = sns.barplot(data=szn_2000, x="shot_distance", y="opponent", hue='shot_made_flag', palette=pal1, ax=axs[1, 0])
+ax4 = sns.barplot(data=szn_2001, x="shot_distance", y="opponent", hue='shot_made_flag', palette=pal1, ax=axs[1, 1])
 #plt.xticks(range(1996,2017,1))
 #plt.yticks(range(0,1600,200))
 plt.show();
 
+#%%
+# OPPONENT - BY SEASON (CHAMPIONSHIP RUN}
+pal1 = {0:'#fdb927', 1:'#552583'}
+fig, axs = plt.subplots(2, 2, figsize=(24,15))
+ax1 = sns.barplot(data=szn_2000, x="shot_distance", y="opponent", hue='shot_made_flag', palette=pal1, ax=axs[0, 0])
+ax2 = sns.barplot(data=szn_2001, x="shot_distance", y="opponent", hue='shot_made_flag', palette=pal1, ax=axs[0, 1])
+ax3 = sns.barplot(data=szn_2002, x="shot_distance", y="opponent", hue='shot_made_flag', palette=pal1, ax=axs[1, 0])
+ax4 = sns.barplot(data=szn_2009, x="shot_distance", y="opponent", hue='shot_made_flag', palette=pal1, ax=axs[1, 1])
 
+#ax4 = sns.barplot(data=szn_2000, x="shot_distance", y="opponent", hue='shot_made_flag', palette=pal1, ax=axs[1, 0])
+#ax5 = sns.barplot(data=szn_2001, x="shot_distance", y="opponent", hue='shot_made_flag', palette=pal1, ax=axs[1, 1])
+#ax6 = sns.barplot(data=szn_2002, x="shot_distance", y="opponent", hue='shot_made_flag', palette=pal1, ax=axs[1, 2])
+#plt.xticks(range(1996,2017,1))
+#plt.yticks(range(0,1600,200))
+plt.show();
 
 #%%
 # SHOOTING SPLITS - MONTHLY
