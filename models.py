@@ -31,7 +31,7 @@ Y = df[target]
 #%%
 # Feature selection
 from sklearn.feature_selection import SelectFdr,SelectKBest, f_classif, chi2
-selector = SelectFdr(f_classif, alpha=0.1)
+selector = SelectKBest(f_classif, k=20)
 selector.fit(X,Y)
 selected_features = list(X.columns[selector.get_support()])
 X = X[selected_features]
