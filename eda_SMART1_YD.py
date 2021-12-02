@@ -14,6 +14,9 @@ from scipy import stats as stats
 import statistics
 import datetime as dt
 
+from scipy.stats import ttest_ind
+from scipy.stats import f_oneway
+
 print("\nIMPORT SUCCESS.")
 
 #%%
@@ -131,13 +134,13 @@ action_accuracy
 #%%
 #### plot accuracy ####
 fig, ax = plt.subplots(figsize=(9, 6))
-sns.scatterplot(x=action_accuracy.index, y="mean", size="count", sizes=(5, 1583), size_norm=(1, 15836),data=action_accuracy, alpha=0.7, color="skyblue")
+sns.scatterplot(x=action_accuracy.index, y="success rate", size="count", sizes=(5, 1583), size_norm=(1, 15836),data=action_accuracy, alpha=0.7, color="skyblue")
 
 # add text label for action type with high frequency and high accuracy
 for i in [0,1,3,6,8]:
-        plt.text(i, action_accuracy["mean"][i], action_accuracy.action_type[i], fontdict=dict(color="blue", alpha=0.5, size=16))
-plt.text(2, action_accuracy["mean"][2], "layup", fontdict=dict(color="blue", alpha=0.5, size=16), ha="center")
-plt.text(5-0.4, action_accuracy["mean"][5]+0.01, action_accuracy.action_type[5], fontdict=dict(color="blue", alpha=0.5, size=16))
+        plt.text(i, action_accuracy["success rate"][i], action_accuracy.action_type[i], fontdict=dict(color="blue", alpha=0.5, size=16))
+plt.text(2, action_accuracy["success rate"][2], "layup", fontdict=dict(color="blue", alpha=0.5, size=16), ha="center")
+plt.text(5-0.4, action_accuracy["success rate"][5]+0.01, action_accuracy.action_type[5], fontdict=dict(color="blue", alpha=0.5, size=16))
 
 plt.legend(bbox_to_anchor=(1, 1))
 plt.title("Shot Accuracy for Each Action Type")
@@ -172,9 +175,9 @@ def shot_side(x):
         @return string: {"right side","left side","middle"}
     """
     if x < 0:
-        return "right side"
-    elif x > 0:
         return "left side"
+    elif x > 0:
+        return "right side"
     else: return "middle"
 #%%
 #### jump shot #####
@@ -187,6 +190,8 @@ kobe_jump["side"] = kobe_jump["loc_x"].apply(lambda x: shot_side(x))
 jump_accuracy2 = kobe_jump.groupby("side")["shot_made_flag"].agg(["mean","count"]).sort_values("mean", ascending=False)
 jump_accuracy2.columns = ["success rate", "count"]
 jump_accuracy2
+#%%
+f_oneway(kobe_jump[kobe_jump['shot_zone_area']=="Left Side(L)"]['shot_made_flag'], kobe_jump[kobe_jump['shot_zone_area']=="Left Side Center(LC)"]['shot_made_flag'],kobe_jump[kobe_jump['shot_zone_area']=="Right Side Center(RC)"]['shot_made_flag'],kobe_jump[kobe_jump['shot_zone_area']=="Right Side(R)"]['shot_made_flag'],kobe_jump[kobe_jump['shot_zone_area']=="Center(C)"]['shot_made_flag'],kobe_jump[kobe_jump['shot_zone_area']=="Back Court(BC)"]['shot_made_flag'])
 #%%
 # plot
 plt.subplots(figsize=(13,11))
@@ -205,6 +210,8 @@ bank_accuracy = kobe_bank.groupby("side")["shot_made_flag"].agg(["mean","count"]
 bank_accuracy.columns = ["success rate", "count"]
 bank_accuracy
 #%%
+ttest_ind(kobe_bank[kobe_bank['loc_x']>0]['shot_made_flag'], kobe_bank[kobe_bank['loc_x']<0]['shot_made_flag'])
+#%%
 # plot
 plt.subplots(figsize=(8,6))
 draw_court(outer_lines=True)
@@ -221,6 +228,8 @@ kobe_hook["side"] = kobe_hook["loc_x"].apply(lambda x: shot_side(x))
 hook_accuracy = kobe_hook.groupby("side")["shot_made_flag"].agg(["mean","count"]).sort_values("mean", ascending=False)
 hook_accuracy.columns = ["success rate", "count"]
 hook_accuracy
+#%%
+ttest_ind(kobe_hook[kobe_hook['loc_x']>0]['shot_made_flag'], kobe_hook[kobe_hook['loc_x']<0]['shot_made_flag'])
 #%%
 # plot
 plt.subplots(figsize=(8,6))
@@ -239,6 +248,9 @@ layup_accuracy = kobe_layup.groupby("side")["shot_made_flag"].agg(["mean","count
 layup_accuracy.columns = ["success rate", "count"]
 layup_accuracy
 #%%
+
+ttest_ind(kobe_layup[kobe_layup['loc_x']>0]['shot_made_flag'], kobe_layup[kobe_layup['loc_x']<0]['shot_made_flag'])
+#%%
 # plot
 plt.subplots(figsize=(8,6))
 draw_court(outer_lines=True)
@@ -256,6 +268,8 @@ tip_accuracy = kobe_tip.groupby("side")["shot_made_flag"].agg(["mean","count"]).
 tip_accuracy.columns = ["success rate", "count"]
 tip_accuracy
 #%%
+ttest_ind(kobe_tip[kobe_tip['loc_x']>0]['shot_made_flag'], kobe_tip[kobe_tip['loc_x']<0]['shot_made_flag'])
+#%%
 # plot
 plt.subplots(figsize=(8,6))
 draw_court(outer_lines=True)
@@ -272,6 +286,8 @@ kobe_dunk["side"] = kobe_dunk["loc_x"].apply(lambda x: shot_side(x))
 dunk_accuracy = kobe_dunk.groupby("side")["shot_made_flag"].agg(["mean","count"]).sort_values("mean", ascending=False)
 dunk_accuracy.columns = ["success rate", "count"]
 dunk_accuracy
+#%%
+f_oneway(kobe_dunk[kobe_dunk['loc_x']==0]['shot_made_flag'], kobe_dunk[kobe_dunk['loc_x']>0]['shot_made_flag'], kobe_dunk[kobe_dunk['loc_x']<0]['shot_made_flag'])
 #%%
 # plot
 plt.subplots(figsize=(8,6))
