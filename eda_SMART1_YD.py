@@ -230,7 +230,7 @@ def shot_side(x):
         @return string: {"right side","left side","middle"}
     """
     if x < 0:
-        return "leftt side"
+        return "left side"
     elif x > 0:
         return "right side"
     else: return "middle"
