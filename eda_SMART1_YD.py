@@ -116,6 +116,81 @@ kobe_bank = kobe_spatial[kobe_spatial.combined_shot_type=="Bank Shot"].copy()
 
 print("\nReady to continue.")
 #%%
+############# shot_zone_area ################
+####### Success Rate #######
+area_accuracy = kobe_spatial.groupby("shot_zone_area")["shot_made_flag"].agg(["mean", "count"]).sort_values("mean", ascending=False)
+area_accuracy.columns = ["success rate", "count"]
+area_accuracy
+#%%
+# t test on accuracy in RC and LC
+ttest_ind(kobe_spatial[kobe_spatial['shot_zone_area']=="Right Side Center(RC)"]['shot_made_flag'],kobe_spatial[kobe_spatial['shot_zone_area']=="Left Side Center(LC)"]['shot_made_flag'])
+#%%
+# f test on all areas
+f_oneway(kobe_spatial[kobe_spatial['shot_zone_area']=="Left Side(L)"]['shot_made_flag'], kobe_spatial[kobe_spatial['shot_zone_area']=="Left Side Center(LC)"]['shot_made_flag'],kobe_spatial[kobe_spatial['shot_zone_area']=="Right Side Center(RC)"]['shot_made_flag'],kobe_spatial[kobe_spatial['shot_zone_area']=="Right Side(R)"]['shot_made_flag'],kobe_spatial[kobe_spatial['shot_zone_area']=="Center(C)"]['shot_made_flag'],kobe_spatial[kobe_spatial['shot_zone_area']=="Back Court(BC)"]['shot_made_flag']) # no significant result
+#%%
+####### scatterplot #######
+plt.subplots(figsize=(8,8))
+draw_court(outer_lines=True)
+sns.scatterplot(x="loc_x", y="loc_y", hue="shot_zone_area",style="shot_made_flag", markers={0:"X", 1:"o"}, data=kobe_spatial, alpha=0.7)
+
+plt.legend(bbox_to_anchor=(1, 1))
+plt.title("Shot Zone Area")
+plt.ylim(-100,600)
+plt.xlim(300,-300)
+plt.show()
+# %%
+############# shot_zone_basic ################
+####### Success Rate #######
+basic_accuracy = kobe_spatial.groupby("shot_zone_basic")["shot_made_flag"].agg(["mean", "count"]).sort_values("mean", ascending=False)
+basic_accuracy.columns = ["success rate", "count"]
+basic_accuracy
+#%%
+# t test
+ttest_ind(kobe_spatial[kobe_spatial['shot_zone_basic']=="Left Corner 3"]['shot_made_flag'],kobe_spatial[kobe_spatial['shot_zone_basic']=="Right Corner 3"]['shot_made_flag'])
+#%%
+# f test on all areas
+f_oneway(kobe_spatial[kobe_spatial["shot_zone_basic"]=="Restricted Area"]["shot_made_flag"], kobe_spatial[kobe_spatial["shot_zone_basic"]=="In The Paint (Non-RA)"]["shot_made_flag"],kobe_spatial[kobe_spatial["shot_zone_basic"]=="Mid-Range"]["shot_made_flag"],kobe_spatial[kobe_spatial["shot_zone_basic"]=="Left Corner 3"]["shot_made_flag"],kobe_spatial[kobe_spatial["shot_zone_basic"]=="Right Corner 3"]["shot_made_flag"],kobe_spatial[kobe_spatial["shot_zone_basic"]=="Above the Break 3"]["shot_made_flag"]) # no significant result
+#%%
+####### scatterplot #######
+plt.subplots(figsize=(8,8))
+draw_court(outer_lines=True)
+sns.scatterplot(x="loc_x", y="loc_y", hue="shot_zone_basic",style="shot_made_flag", markers={0:"X", 1:"o"}, data=kobe_spatial, alpha=0.7)
+
+plt.legend(bbox_to_anchor=(1, 1))
+plt.title("Shot Zone Basic")
+plt.ylim(-100,500)
+plt.xlim(300,-300)
+plt.show()
+# %%
+############# shot_zone_range and distance ################
+####### Success Rate #######
+range_accuracy = kobe_spatial.groupby("shot_zone_range")["shot_made_flag"].agg(["mean", "count"]).sort_values("mean", ascending=False)
+range_accuracy.columns = ["success rate", "count"]
+range_accuracy
+#%%
+####### scatterplot #######
+plt.subplots(figsize=(8,8))
+draw_court(outer_lines=True)
+sns.scatterplot(x="loc_x", y="loc_y", hue="shot_zone_range",style="shot_made_flag", markers={0:"X", 1:"o"}, data=kobe_spatial, alpha=0.7)
+
+plt.legend(bbox_to_anchor=(1, 1))
+plt.title("Shot Zone Range")
+plt.ylim(-100,900)
+plt.xlim(300,-300)
+plt.show()
+# %%
+####### Accuracy vs Distance #######
+sns.lmplot(x="shot_distance", y="shot_made_flag",data=kobe_spatial[kobe_spatial.shot_distance < 50],y_jitter=0.02, logistic=True, palette="Blue_r")
+
+plt.title("Accuracy vs Distance")
+plt.xlim(0,55)
+plt.ylabel("Succeed")
+plt.xlabel("Distance(ft)")
+plt.show()
+#%%[markdown]
+## Shot Zone Areas Summary
+# It is clear that the accuracy of Kobe's shots is negatively related with his distance from the hoop. The closer he is to the basket, the more accurate he is. Not surprisingly, every shots shoot from the back court area failed unless some accident happens. Kobe is most accurate when he shoots from the center area.
+# %%
 ############### Action Type ##################
 ####### Action Type Success Rate #######
 action_accuracy = kobe_action.groupby("action_type")["shot_made_flag"].agg(["mean", "count"]).sort_values("count", ascending=False)
@@ -291,78 +366,6 @@ plt.show()
 #
 # It is very likely to score when Kobe attempts a dunk shot or a bank shot.  
 # %%
-############# shot_zone_area ################
-####### Success Rate #######
-area_accuracy = kobe_spatial.groupby("shot_zone_area")["shot_made_flag"].agg(["mean", "count"]).sort_values("mean", ascending=False)
-area_accuracy.columns = ["success rate", "count"]
-area_accuracy
-#%%
-# t test on accuracy in RC and LC
-ttest_ind(kobe_spatial[kobe_spatial['shot_zone_area']=="Right Side Center(RC)"]['shot_made_flag'],kobe_spatial[kobe_spatial['shot_zone_area']=="Left Side Center(LC)"]['shot_made_flag'])
-#%%
-# f test on all areas
-f_oneway(kobe_spatial[kobe_spatial['shot_zone_area']=="Left Side(L)"]['shot_made_flag'], kobe_spatial[kobe_spatial['shot_zone_area']=="Left Side Center(LC)"]['shot_made_flag'],kobe_spatial[kobe_spatial['shot_zone_area']=="Right Side Center(RC)"]['shot_made_flag'],kobe_spatial[kobe_spatial['shot_zone_area']=="Right Side(R)"]['shot_made_flag'],kobe_spatial[kobe_spatial['shot_zone_area']=="Center(C)"]['shot_made_flag'],kobe_spatial[kobe_spatial['shot_zone_area']=="Back Court(BC)"]['shot_made_flag']) # no significant result
-#%%
-####### scatterplot #######
-plt.subplots(figsize=(8,8))
-draw_court(outer_lines=True)
-sns.scatterplot(x="loc_x", y="loc_y", hue="shot_zone_area",style="shot_made_flag", markers={0:"X", 1:"o"}, data=kobe_spatial, alpha=0.7)
-
-plt.legend(bbox_to_anchor=(1, 1))
-plt.title("Shot Zone Area")
-plt.ylim(-100,600)
-plt.xlim(300,-300)
-plt.show()
-# %%
-############# shot_zone_basic ################
-####### Success Rate #######
-basic_accuracy = kobe_spatial.groupby("shot_zone_basic")["shot_made_flag"].agg(["mean", "count"]).sort_values("mean", ascending=False)
-basic_accuracy.columns = ["success rate", "count"]
-basic_accuracy
-#%%
-# f test on all areas
-f_oneway(kobe_spatial[kobe_spatial["shot_zone_basic"]=="Restricted Area"]["shot_made_flag"], kobe_spatial[kobe_spatial["shot_zone_basic"]=="In The Paint (Non-RA)"]["shot_made_flag"],kobe_spatial[kobe_spatial["shot_zone_basic"]=="Mid-Range"]["shot_made_flag"],kobe_spatial[kobe_spatial["shot_zone_basic"]=="Left Corner 3"]["shot_made_flag"],kobe_spatial[kobe_spatial["shot_zone_basic"]=="Right Corner 3"]["shot_made_flag"],kobe_spatial[kobe_spatial["shot_zone_basic"]=="Above the Break 3"]["shot_made_flag"]) # no significant result
-#%%
-####### scatterplot #######
-plt.subplots(figsize=(8,8))
-draw_court(outer_lines=True)
-sns.scatterplot(x="loc_x", y="loc_y", hue="shot_zone_basic",style="shot_made_flag", markers={0:"X", 1:"o"}, data=kobe_spatial, alpha=0.7)
-
-plt.legend(bbox_to_anchor=(1, 1))
-plt.title("Shot Zone Basic")
-plt.ylim(-100,500)
-plt.xlim(300,-300)
-plt.show()
-# %%
-############# shot_zone_range and distance ################
-####### Success Rate #######
-range_accuracy = kobe_spatial.groupby("shot_zone_range")["shot_made_flag"].agg(["mean", "count"]).sort_values("mean", ascending=False)
-range_accuracy.columns = ["success rate", "count"]
-range_accuracy
-#%%
-####### scatterplot #######
-plt.subplots(figsize=(8,8))
-draw_court(outer_lines=True)
-sns.scatterplot(x="loc_x", y="loc_y", hue="shot_zone_range",style="shot_made_flag", markers={0:"X", 1:"o"}, data=kobe_spatial, alpha=0.7)
-
-plt.legend(bbox_to_anchor=(1, 1))
-plt.title("Shot Zone Range")
-plt.ylim(-100,900)
-plt.xlim(300,-300)
-plt.show()
-# %%
-####### Accuracy vs Distance #######
-sns.lmplot(x="shot_distance", y="shot_made_flag",data=kobe_spatial[kobe_spatial.shot_distance < 50],y_jitter=0.02, logistic=True, palette="Blue_r")
-
-plt.title("Accuracy vs Distance")
-plt.xlim(0,55)
-plt.ylabel("Succeed")
-plt.xlabel("Distance(ft)")
-plt.show()
-#%%[markdown]
-## Shot Zone Areas Summary
-# It is clear that the accuracy of Kobe's shots is negatively related with his distance from the hoop. The closer he is to the basket, the more accurate he is. Not surprisingly, every shots shoot from the back court area failed unless some accident happens. Kobe is most accurate when he shoots from the center area.
-# %%
 # ###### model ######
 # import numpy as np
 # import pandas as pd
@@ -405,3 +408,4 @@ plt.show()
 # print("Precision:", metrics.precision_score(y_test, y_pred))
 # print("Recall:", metrics.recall_score(y_test, y_pred))
 # # %%
+
