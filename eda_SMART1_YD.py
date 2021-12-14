@@ -10,6 +10,8 @@ from scipy import stats as stats
 
 from scipy.stats import ttest_ind
 from scipy.stats import f_oneway
+from statsmodels.stats.multicomp import pairwise_tukeyhsd
+
 
 print("\nIMPORT SUCCESS.")
 #%%
@@ -122,11 +124,11 @@ area_accuracy = kobe_spatial.groupby("shot_zone_area")["shot_made_flag"].agg(["m
 area_accuracy.columns = ["success rate", "count"]
 area_accuracy
 #%%
-# t test on accuracy in RC and LC
-ttest_ind(kobe_spatial[kobe_spatial['shot_zone_area']=="Right Side Center(RC)"]['shot_made_flag'],kobe_spatial[kobe_spatial['shot_zone_area']=="Left Side Center(LC)"]['shot_made_flag'])
-#%%
 # f test on all areas
-f_oneway(kobe_spatial[kobe_spatial['shot_zone_area']=="Left Side(L)"]['shot_made_flag'], kobe_spatial[kobe_spatial['shot_zone_area']=="Left Side Center(LC)"]['shot_made_flag'],kobe_spatial[kobe_spatial['shot_zone_area']=="Right Side Center(RC)"]['shot_made_flag'],kobe_spatial[kobe_spatial['shot_zone_area']=="Right Side(R)"]['shot_made_flag'],kobe_spatial[kobe_spatial['shot_zone_area']=="Center(C)"]['shot_made_flag'],kobe_spatial[kobe_spatial['shot_zone_area']=="Back Court(BC)"]['shot_made_flag']) # no significant result
+f_oneway(kobe_spatial[kobe_spatial['shot_zone_area']=="Left Side(L)"]['shot_made_flag'], kobe_spatial[kobe_spatial['shot_zone_area']=="Left Side Center(LC)"]['shot_made_flag'],kobe_spatial[kobe_spatial['shot_zone_area']=="Right Side Center(RC)"]['shot_made_flag'],kobe_spatial[kobe_spatial['shot_zone_area']=="Right Side(R)"]['shot_made_flag'],kobe_spatial[kobe_spatial['shot_zone_area']=="Center(C)"]['shot_made_flag'],kobe_spatial[kobe_spatial['shot_zone_area']=="Back Court(BC)"]['shot_made_flag']) # significant
+#%%
+# post hoc
+print(pairwise_tukeyhsd(kobe_spatial.shot_made_flag, kobe_spatial.shot_zone_area))
 #%%
 ####### scatterplot #######
 plt.subplots(figsize=(8,8))
@@ -145,11 +147,11 @@ basic_accuracy = kobe_spatial.groupby("shot_zone_basic")["shot_made_flag"].agg([
 basic_accuracy.columns = ["success rate", "count"]
 basic_accuracy
 #%%
-# t test
-ttest_ind(kobe_spatial[kobe_spatial['shot_zone_basic']=="Left Corner 3"]['shot_made_flag'],kobe_spatial[kobe_spatial['shot_zone_basic']=="Right Corner 3"]['shot_made_flag'])
-#%%
 # f test on all areas
-f_oneway(kobe_spatial[kobe_spatial["shot_zone_basic"]=="Restricted Area"]["shot_made_flag"], kobe_spatial[kobe_spatial["shot_zone_basic"]=="In The Paint (Non-RA)"]["shot_made_flag"],kobe_spatial[kobe_spatial["shot_zone_basic"]=="Mid-Range"]["shot_made_flag"],kobe_spatial[kobe_spatial["shot_zone_basic"]=="Left Corner 3"]["shot_made_flag"],kobe_spatial[kobe_spatial["shot_zone_basic"]=="Right Corner 3"]["shot_made_flag"],kobe_spatial[kobe_spatial["shot_zone_basic"]=="Above the Break 3"]["shot_made_flag"]) # no significant result
+f_oneway(kobe_spatial[kobe_spatial["shot_zone_basic"]=="Restricted Area"]["shot_made_flag"], kobe_spatial[kobe_spatial["shot_zone_basic"]=="In The Paint (Non-RA)"]["shot_made_flag"],kobe_spatial[kobe_spatial["shot_zone_basic"]=="Mid-Range"]["shot_made_flag"],kobe_spatial[kobe_spatial["shot_zone_basic"]=="Left Corner 3"]["shot_made_flag"],kobe_spatial[kobe_spatial["shot_zone_basic"]=="Right Corner 3"]["shot_made_flag"],kobe_spatial[kobe_spatial["shot_zone_basic"]=="Above the Break 3"]["shot_made_flag"]) # significant
+#%%
+# post hoc
+print(pairwise_tukeyhsd(kobe_spatial.shot_made_flag, kobe_spatial.shot_zone_basic))
 #%%
 ####### scatterplot #######
 plt.subplots(figsize=(8,8))
@@ -247,8 +249,8 @@ jump_accuracy2 = kobe_jump.groupby("side")["shot_made_flag"].agg(["mean","count"
 jump_accuracy2.columns = ["success rate", "count"]
 jump_accuracy2
 #%%
-## F test on shot sides ##
-f_oneway(kobe_jump[kobe_jump['shot_zone_area']=="Left Side(L)"]['shot_made_flag'], kobe_jump[kobe_jump['shot_zone_area']=="Left Side Center(LC)"]['shot_made_flag'],kobe_jump[kobe_jump['shot_zone_area']=="Right Side Center(RC)"]['shot_made_flag'],kobe_jump[kobe_jump['shot_zone_area']=="Right Side(R)"]['shot_made_flag'],kobe_jump[kobe_jump['shot_zone_area']=="Center(C)"]['shot_made_flag'],kobe_jump[kobe_jump['shot_zone_area']=="Back Court(BC)"]['shot_made_flag'])
+## T test on shot sides ##
+ttest_ind(kobe_jump[kobe_jump['loc_x']>0]['shot_made_flag'], kobe_jump[kobe_jump['loc_x']<0]['shot_made_flag'])
 #%%
 ## scatterplot ##
 plt.subplots(figsize=(13,11))
