@@ -16,25 +16,30 @@ target = 'shot_made_flag'
 X = df[categorical_features + numerical_features]
 Y = df[target]
 #%%
+# Feature selection
+from sklearn.feature_selection import SelectFdr,SelectKBest, f_classif, chi2
+from sklearn.preprocessing import LabelEncoder
+le = LabelEncoder()
+X[categorical_features] = X[categorical_features].apply(LabelEncoder().fit_transform)
+selector = SelectKBest(f_classif, k=8)
+selector.fit(X,Y)
+selected_features = list(X.columns[selector.get_support()])
+X = df[selected_features]
+#%%
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
+numerical_features_selected = [x for x in numerical_features if x in selected_features]
+categorical_features_selected = [x for x in categorical_features if x in selected_features]
 scaler = StandardScaler()
-X[numerical_features] = scaler.fit_transform(X[numerical_features])
+X[numerical_features_selected] = scaler.fit_transform(X[numerical_features_selected])
 
-X_categorical_one_hot = pd.get_dummies(df[categorical_features])
-X = pd.concat([df[numerical_features], X_categorical_one_hot], axis=1)
+X_categorical_one_hot = pd.get_dummies(df[categorical_features_selected])
+X = pd.concat([df[numerical_features_selected], X_categorical_one_hot], axis=1)
 Y = df[target]
 
 
 
-#%%
-# Feature selection
-from sklearn.feature_selection import SelectFdr,SelectKBest, f_classif, chi2
-selector = SelectFdr(f_classif, alpha=0.1)
-selector.fit(X,Y)
-selected_features = list(X.columns[selector.get_support()])
-X = X[selected_features]
 
 #%%
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, shuffle=False)
@@ -81,10 +86,10 @@ from sklearn.metrics import confusion_matrix
 print(confusion_matrix(Y_test, Y_pred))
 
 # %%
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import DecisionTreeClassifier, plot_tree
 
 # fit model
-tree = DecisionTreeClassifier(criterion='gini')
+tree = DecisionTreeClassifier(criterion='gini', min_samples_split= 2000, min_impurity_decrease = 0.0001)
 tree.fit(X_train, Y_train)
 # get importance
 feature_importance = pd.DataFrame({'feature': X.columns, 'gini index': tree.feature_importances_})
@@ -120,10 +125,3 @@ print('Recall:', recall_score(Y_test, Y_pred))
 from sklearn.metrics import confusion_matrix
 print(confusion_matrix(Y_test, Y_pred))
 
-# %%
-
-# %%
-
-# %%
-
-# %%
