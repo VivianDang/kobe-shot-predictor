@@ -1,21 +1,15 @@
 #%% [markdown]
 
-### KAGGLE PROMPT: 
-
-# * Using 20 years of data on Kobe's swishes and misses, can you predict which shots will find the bottom of the net?
-# * This competition is well suited for practicing classification basics, feature engineering, and time series analysis.
-
-# * Practice got Kobe an eight-figure contract and 5 championship rings. What will it get you?
-
-#%% [markdown]
-
-### SMART QUESTIONS: 
-##### (1) Does the game situation affect accuracy?
-    # * Regular Season vs Playoffs
-    # * Periods / Minutes
-    # * Clutch Time
-##### (2) Does the spatial location of shots affect accuracy?
-##### (3) Do his shots indicate the hot hand effect?
+### SMART QUESTION: 
+##### (1) Do specific game situations affect accuracy?
+    # * Periods
+    # * Overtime
+    # * Clutch-Time
+    # * Playoffs    
+    # * Home / Away
+    # * Opponents
+    # * Seasons
+    # * Championships
 
 #%%
 # LIBRARY IMPORTS
@@ -31,14 +25,18 @@ import datetime as dt
 print("\nIMPORT SUCCESS")
 
 #%%
-# DATA IMPORTS
-kobe = '/Users/nehat312/kobe-shot-predictor/data/data_NE.csv'
+# KAGGLE DATA IMPORT
+# https://www.kaggle.com/c/kobe-bryant-shot-selection/data
+kobe = '/Users/nehat312/kobe-shot-predictor/data/data_situational.csv'
 kobe = pd.read_csv(kobe, header = 0, index_col = 'shot_id')
 kobe.info()
 
-opp_stats = '/Users/nehat312/kobe-shot-predictor/images/image_scratch.xlsx'
+#%%
+# SUPPLEMENTAL DATA IMPORT
+# https://www.basketball-reference.com/
+opp_stats = '/Users/nehat312/kobe-shot-predictor/data/opponents.xlsx'
 opp_stats = pd.read_excel(opp_stats, sheet_name = 'OPP STATS', header = 0, index_col = 'OPP')
-#opp_stats.info()
+opp_stats.info()
 
 #%% [markdown]
 ## DATA DICTIONARY
@@ -46,10 +44,6 @@ opp_stats = pd.read_excel(opp_stats, sheet_name = 'OPP STATS', header = 0, index
 # * shot_made_flag = [0, 1]
 # * playoffs = [0, 1]
 # * game_event_id = [2~659]
-# * lat = 
-# * lon = 
-# * loc_x = 
-# * loc_y = 
 # * minutes_remaining = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 # * seconds_remaining = [27, 22, 45, 52, 19, 32,  5, 12, 36, 56,  0,  9, 44, 16, 48,  1, 50, 29, 46,  8,  4, 57, 47, 11, 30, 20, 26, 58, 33, 13, 59, 21, 55, 38, 6, 40, 10,  2, 37, 17, 53, 15, 24, 49, 41, 54, 25, 39, 14, 43, 23, 18, 34, 51, 28,  3,  7, 42, 35, 31]
 # * period = [1, 2, 3, 4]
@@ -59,7 +53,6 @@ opp_stats = pd.read_excel(opp_stats, sheet_name = 'OPP STATS', header = 0, index
 # * combined_shot_type = ['Jump Shot', 'Dunk', 'Layup', 'Tip Shot', 'Hook Shot', 'Bank Shot']
 # * shot_zone_range = ['Right Side(R)', 'Left Side(L)', 'Left Side Center(LC)', 'Right Side Center(RC)', 'Center(C)', 'Back Court(BC)']
 # * shot_zone_basic = ['Mid-Range', 'Restricted Area', 'In The Paint (Non-RA)', 'Above the Break 3', 'Right Corner 3', 'Backcourt', 'Left Corner 3']
-# * matchup = ['LAL @ POR', 'LAL vs. UTA', 'LAL @ VAN', 'LAL vs. LAC', 'LAL @ HOU', 'LAL @ SAS', 'LAL vs. HOU', 'LAL vs. DEN', 'LAL @ SAC', 'LAL @ DEN', 'LAL vs. CHI', 'LAL vs. GSW', 'LAL vs. MIN', 'LAL @ LAC', 'LAL vs. IND', 'LAL @ SEA', 'LAL vs. SAS', 'LAL vs. DAL', 'LAL vs. PHI', 'LAL @ GSW', 'LAL vs. SEA', 'LAL vs. DET', 'LAL vs. MIL', 'LAL vs. VAN', 'LAL @ TOR', 'LAL @ MIA', 'LAL @ DAL', 'LAL vs. POR', 'LAL @ PHX', 'LAL vs. CLE', 'LAL @ UTA', 'LAL vs. MIA', 'LAL vs. NJN', 'LAL @ NYK', 'LAL @ CLE', 'LAL @ MIN', 'LAL vs. CHH', 'LAL vs. SAC', 'LAL vs. PHX', 'LAL @ NJN', 'LAL @ PHI', 'LAL @ CHH', 'LAL @ IND', 'LAL vs. TOR', 'LAL @ DET', 'LAL @ WAS', 'LAL @ ORL', 'LAL @ ATL', 'LAL @ MIL', 'LAL vs. NYK', 'LAL vs. MEM', 'LAL vs. ORL', 'LAL @ MEM', 'LAL @ CHI', 'LAL vs. WAS', 'LAL vs. ATL', 'LAL vs. BOS', 'LAL @ BOS', 'LAL vs. NOH', 'LAL @ NOH', 'LAL @ UTH', 'LAL vs. SAN', 'LAL @ NOK', 'LAL @ PHO', 'LAL vs. NOK', 'LAL vs. PHO', 'LAL @ CHA', 'LAL vs. CHA', 'LAL vs. OKC', 'LAL @ OKC', 'LAL vs. BKN', 'LAL @ BKN', 'LAL @ NOP', 'LAL vs. NOP']
 # * opponent = ['POR', 'UTA', 'VAN', 'LAC', 'HOU', 'SAS', 'DEN', 'SAC', 'CHI', 'GSW', 'MIN', 'IND', 'SEA', 'DAL', 'PHI', 'DET', 'MIL', 'TOR', 'MIA', 'PHX', 'CLE', 'NJN', 'NYK', 'CHA', 'WAS', 'ORL', 'ATL', 'MEM', 'BOS', 'NOH', 'NOP', 'OKC', 'BKN']
 
 #%%
@@ -293,9 +286,6 @@ plt.ylabel("OPPONENT", fontsize = 16)
 plt.legend(loc='best');
 
 #%%
-yearly_splits.columns
-
-#%%
 # OPPONENT - BY SEASON
 #pal1 = {0:'#fdb927', 1:'#552583'}
 pal_opps = {'#fdb927', '#552583'}
@@ -311,19 +301,7 @@ plt.legend(loc='best');
 #plt.yticks(range(0,1600,200))
 
 #%%
-# OPPONENT - BY SEASON
-pal1 = {0:'#fdb927', 1:'#552583'}
-fig, axs = plt.subplots(2, 2, figsize=(24,18))
-ax1 = sns.barplot(data=szn_1998, x="shot_distance", y="opponent", hue='shot_made_flag', palette=pal1, ax=axs[0, 0])
-ax2 = sns.barplot(data=szn_1999, x="shot_distance", y="opponent", hue='shot_made_flag', palette=pal1, ax=axs[0, 1])
-ax3 = sns.barplot(data=szn_2000, x="shot_distance", y="opponent", hue='shot_made_flag', palette=pal1, ax=axs[1, 0])
-ax4 = sns.barplot(data=szn_2001, x="shot_distance", y="opponent", hue='shot_made_flag', palette=pal1, ax=axs[1, 1])
-#plt.xticks(range(1996,2017,1))
-#plt.yticks(range(0,1600,200))
-plt.show();
-
-#%%
-# OPPONENT - BY SEASON (CHAMPIONSHIP RUN}
+# OPPONENT - BY SEASON (CHAMPIONSHIP RUNS}
 pal1 = {0:'#fdb927', 1:'#552583'}
 fig, axs = plt.subplots(2, 2, figsize=(24,15))
 ax1 = sns.barplot(data=szn_2000, x="shot_distance", y="opponent", hue='shot_made_flag', palette=pal1, ax=axs[0, 0])
@@ -339,31 +317,3 @@ ax4 = sns.barplot(data=szn_2009, x="shot_distance", y="opponent", hue='shot_made
 plt.show();
 
 #%%
-# SHOOTING SPLITS - MONTHLY
-pal1 = {0:'#fdb927', 1:'#552583'}
-
-plt.figure(figsize=(12,9))
-sns.barplot(data=home, x='game_month', y='shot_made_flag', hue='home', style='home', legend=True, markers = True, palette=pal1)
-plt.title("PLAYOFFS / REGULAR SEASON FG%", fontsize = 20)
-plt.xlabel("SHOT DISTANCE (FT.)", fontsize = 16)
-plt.xticks(range(0,13,1))
-plt.ylabel("FIELD GOAL %", fontsize = 16);
-#plt.yticks(range(0,1.2,.2));
-
-
-#%%
-# HEATMAP - correlation generated to visualize target / variable relationships
-kobe_corr = kobe_clean.corr()[['shot_made_flag']].sort_values('shot_made_flag', ascending=False)
-plt.figure(figsize=(12,15))
-sns.heatmap(kobe_corr, annot = True, cmap = 'mako', vmin=-1, vmax=1, linecolor = 'white', linewidth = .005);
-
-#%%
-# SHOTS BY MONTH
-# TEAM / OPPONENT ANALYSIS
-# BIRTHDAY
-# CHILD BDAY
-
-
-
-#%%
-print("\nEDA CONCLUSION")
