@@ -27,14 +27,14 @@ print("\nIMPORT SUCCESS")
 #%%
 # KAGGLE DATA IMPORT
 # https://www.kaggle.com/c/kobe-bryant-shot-selection/data
-kobe = '/Users/nehat312/kobe-shot-predictor/data/data_situational.csv'
+kobe = 'data/data_situational.csv'
 kobe = pd.read_csv(kobe, header = 0, index_col = 'shot_id')
 kobe.info()
 
 #%%
 # SUPPLEMENTAL DATA IMPORT
 # https://www.basketball-reference.com/
-opp_stats = '/Users/nehat312/kobe-shot-predictor/data/opponents.xlsx'
+opp_stats = 'data/opponents.xlsx'
 opp_stats = pd.read_excel(opp_stats, sheet_name = 'OPP STATS', header = 0, index_col = 'OPP')
 opp_stats.info()
 
@@ -307,6 +307,4 @@ ax4 = sns.barplot(data=szn_2009, x="shot_distance", y="opponent", hue='shot_made
 #ax6 = sns.barplot(data=szn_2002, x="shot_distance", y="opponent", hue='shot_made_flag', palette=pal1, ax=axs[1, 2])
 #plt.xticks(range(1996,2017,1))
 #plt.yticks(range(0,1600,200))
-plt.show();
-
-#%%
+plt.show()

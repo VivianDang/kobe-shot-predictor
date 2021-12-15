@@ -3,8 +3,9 @@ from numpy import average
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
 
-df = pd.read_csv("data_cleaned.csv")
+df = pd.read_csv("data/data_cleaned.csv")
 
 
 #%%
@@ -38,5 +39,3 @@ from scipy.stats import ttest_ind
 ttest_ind(df[df['made_last_shot']==1]['shot_made_flag'], df[df['made_last_shot']==0]['shot_made_flag'])
 
 # No significant difference == no hot hand effect
-
-# %%

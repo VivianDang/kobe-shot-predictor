@@ -6,7 +6,7 @@ import seaborn as sns
 
 
 #%%
-df = pd.read_csv("data_cleaned.csv")
+df = pd.read_csv("data/data_cleaned.csv")
 
 # %%
 
@@ -125,3 +125,19 @@ print('Recall:', recall_score(Y_test, Y_pred))
 from sklearn.metrics import confusion_matrix
 print(confusion_matrix(Y_test, Y_pred))
 
+
+# %%
+
+# %%
+
+# %%
+
+# %%
+
+# %%
+
+# %%
+
+# %%
+
+# %%
