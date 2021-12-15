@@ -170,13 +170,6 @@ plt.ylabel("SHOT DISTANCE", fontsize = 16)
 plt.yticks(range(0,40,5));
 
 #%%
-# SHOOTING SPLITS - BY HALF [1-2] / MINUTES REMAINING [0-11]
-half1_pct = pd.DataFrame(half1.groupby("shot_distance")["shot_made_flag"].mean())
-half2_pct = pd.DataFrame(half2.groupby("shot_distance")["shot_made_flag"].mean())
-halves_pct = pd.concat([half1_pct, half2_pct], axis=1)
-halves_pct.describe()
-
-#%%
 # SHOOTING SPLITS - CLUTCHTIME [PERIODS 4-7] / <5 MINUTES
 pal1 = {0:'#fdb927', 1:'#552583'}
 plt.figure(figsize=(12,9))
