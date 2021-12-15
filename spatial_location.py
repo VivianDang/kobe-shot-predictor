@@ -16,7 +16,7 @@ from statsmodels.stats.multicomp import pairwise_tukeyhsd
 print("\nIMPORT SUCCESS.")
 #%%
 # DATA IMPORTS
-kobe_clean = pd.read_csv('data_cleaned.csv')#, header = 0, index_col = 'shot_id')
+kobe_clean = pd.read_csv('data/data_cleaned.csv')#, header = 0, index_col = 'shot_id')
 kobe_clean.info()
 
 print("\nIMPORT SUCCESS.")
@@ -367,4 +367,3 @@ plt.show()
 # Shot side has no significant effect on shot accuracy.  
 #
 # It is very likely to score when Kobe attempts a dunk shot or a bank shot.  
-# %%
